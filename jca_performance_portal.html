@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JCA Performance Portal — Jio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f5;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --text1: #1a1a1a;
+    --text2: #5f6368;
+    --text3: #9aa0a6;
+    --blue: #1a73e8;
+    --blue-bg: #e8f0fe;
+    --blue-text: #1a5fb4;
+    --green: #1e8b4c;
+    --green-bg: #e6f4ea;
+    --green-text: #1e6b3c;
+    --red: #e74c3c;
+    --red-bg: #fce8e6;
+    --red-text: #b31412;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --surface2: #2a2a2a;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.2);
+      --text1: #e8eaed;
+      --text2: #9aa0a6;
+      --text3: #5f6368;
+      --blue: #4fa3ff;
+      --blue-bg: #1a2a42;
+      --blue-text: #8ab4f8;
+      --green: #4caf7a;
+      --green-bg: #1a2e22;
+      --green-text: #81c995;
+      --red: #ff6b6b;
+      --red-bg: #2e1a1a;
+      --red-text: #f28b82;
+    }
+  }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text1);
+    min-height: 100vh;
+  }
+  /* TOPBAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .jio-pill {
+    background: var(--blue);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .topbar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text1);
+  }
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+  }
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+  /* LOOKUP CARD */
+  .lookup-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  .lookup-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: var(--shadow-md);
+  }
+  .lookup-card .hero-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--blue-bg);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    font-size: 26px;
+  }
+  .lookup-card h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text1);
+    margin-bottom: 6px;
+  }
+  .lookup-card .sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 26px;
+    line-height: 1.5;
+  }
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 7px;
+    letter-spacing: 0.2px;
+  }
+  .step-label {
+    display: inline-block;
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 18px;
+    margin-right: 6px;
+  }
+  .upload-zone {
+    position: relative;
+    border: 2px dashed var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .upload-zone:hover { border-color: var(--blue); background: var(--blue-bg); }
+  .upload-zone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .upload-zone svg { margin-bottom: 8px; }
+  .upload-zone .uz-text { font-size: 13px; color: var(--text2); }
+  .upload-zone .uz-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .upload-zone.has-file { border-color: var(--green); background: var(--green-bg); }
+  .upload-zone.has-file .uz-text { color: var(--green-text); font-weight: 600; }
+  .prm-row { display: flex; gap: 8px; margin-bottom: 6px; }
+  .prm-row input {
+    flex: 1;
+    height: 42px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 0 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text1);
+    background: var(--surface);
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.15s;
+    letter-spacing: 1px;
+  }
+  .prm-row input:focus { border-color: var(--blue); }
+  .btn-primary {
+    height: 42px;
+    padding: 0 22px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-ghost {
+    height: 36px;
+    padding: 0 16px;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-ghost:hover { background: var(--surface2); }
+  .error-msg {
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 6px;
+    display: none;
+  }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+  .format-hint {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .format-hint p { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .format-hint code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--text1);
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+  .demo-btn-wrap { text-align: center; margin-top: 14px; }
+  /* DASHBOARD */
+  .dash-topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .jca-name { font-size: 22px; font-weight: 700; color: var(--text1); }
+  .jca-meta { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .metric-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .metric-card.accent { background: var(--blue-bg); }
+  .m-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+  }
+  .m-label svg { flex-shrink: 0; }
+  .m-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text1);
+    line-height: 1;
+  }
+  .metric-card.accent .m-value { color: var(--blue); }
+  .m-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .section-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+    margin-top: 22px;
+  }
+  .lt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 480px) { .lt-grid { grid-template-columns: 1fr; } }
+  .lt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+  .lt-head {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .lt-alloc-num { font-size: 22px; font-weight: 700; color: var(--text1); line-height: 1; }
+  .lt-alloc-label { font-size: 11px; color: var(--text3); font-weight: 400; }
+  .lt-conv-line { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .mini-bar { height: 4px; border-radius: 2px; background: var(--surface2); margin-top: 8px; overflow: hidden; }
+  .mini-fill { height: 100%; border-radius: 2px; }
+  .lt-pct { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .tab-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text2);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    border-radius: 0;
+  }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+  th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-align: left;
+    padding: 9px 12px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text1);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr.subtotal td {
+    background: var(--surface2);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+  .tag-sc { background: var(--blue-bg); color: var(--blue-text); }
+  .tag-rr { background: var(--green-bg); color: var(--green-text); }
+  .tag-ht { background: var(--red-bg); color: var(--red-text); }
+  .pct-bar {
+    display: inline-block;
+    vertical-align: middle;
+    width: 60px;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-right: 6px;
+  }
+  .pct-fill { height: 100%; border-radius: 3px; }
+  /* CHART */
+  .chart-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .chart-legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-sq {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  /* FOOTER */
+  .portal-footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <span class="jio-pill">JIO</span>
+    <span class="topbar-title">JCA Performance Portal</span>
+  </div>
+  <div class="topbar-right" id="topbar-right"></div>
+</div>
+
+<div class="main">
+
+  <!-- SCREEN 1: LOOKUP -->
+  <div id="screen-lookup" class="screen active">
+    <div class="lookup-wrap">
+      <div class="lookup-card">
+        <div class="hero-icon">📊</div>
+        <h2>Check your performance</h2>
+        <p class="sub">Upload today's data file, then enter your PRM ID to view your personal dashboard.</p>
+
+        <div style="margin-bottom:6px">
+          <div class="field-label"><span class="step-label">1</span>Upload data file</div>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" accept=".csv,.xlsx,.xls">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);margin:0 auto 6px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="uz-text" id="upload-label">Click to upload Excel / CSV</div>
+            <div class="uz-hint">.xlsx, .xls, .csv supported</div>
+          </div>
+        </div>
+
+        <div class="field-label"><span class="step-label">2</span>Enter PRM ID</div>
+        <div class="prm-row">
+          <input type="text" id="prm-input" placeholder="e.g. JCA10045" autocomplete="off">
+          <button class="btn-primary" onclick="lookupPRM()">View →</button>
+        </div>
+        <div class="error-msg" id="error-msg">⚠ PRM ID not found in the uploaded data.</div>
+
+        <hr class="divider">
+        <div class="format-hint">
+          <p>📋 Required columns in your Excel / CSV file:</p>
+          <code>PRM_ID | Name | JC_Code | Lap | Lead_Type | Allocated | Converted | Eff_Call | Commission</code>
+        </div>
+
+        <div class="demo-btn-wrap">
+          <button class="btn-ghost" onclick="loadDemo()">🔬 Load demo data to try</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: DASHBOARD -->
+  <div id="screen-dash" class="screen">
+    <div class="dash-topbar">
+      <div>
+        <div class="jca-name" id="jca-name">—</div>
+        <div class="jca-meta" id="jca-meta">—</div>
+      </div>
+      <button class="btn-ghost" onclick="goBack()">← Back</button>
+    </div>
+
+    <div class="section-heading">Summary</div>
+    <div class="metrics-grid" id="metrics-grid"></div>
+
+    <div class="section-heading">Lead type breakdown</div>
+    <div class="lt-grid" id="lt-grid"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-btn-lap" onclick="switchTab('lap',this)">Lap-wise breakdown</button>
+      <button class="tab-btn" id="tab-btn-chart" onclick="switchTab('chart',this)">Conversion chart</button>
+    </div>
+
+    <div id="tab-lap" class="tab-pane active">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Lap</th><th>Lead type</th><th>Allocated</th><th>Converted</th>
+            <th>Eff. calls (&lt;40s)</th><th>Conversion %</th><th>Commission (₹)</th>
+          </tr></thead>
+          <tbody id="lap-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-chart" class="tab-pane">
+      <div class="chart-box">
+        <div style="position:relative;width:100%;height:260px">
+          <canvas id="lapChart" role="img" aria-label="Lap-wise lead allocation vs conversion bar chart"></canvas>
+        </div>
+        <div class="chart-legend" id="chart-legend"></div>
+      </div>
+    </div>
+
+    <div class="portal-footer">
+      Jio · JCA Performance Portal · Data refreshed on upload · For internal use only
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+let allData = [];
+let chartInst = null;
+
+/* ---- DEMO DATA ---- */
+const DEMO = [
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:1,Lead_Type:"SC+",Allocated:20,Converted:14,Eff_Call:12,Commission:1400},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:1,Lead_Type:"RR",Allocated:15,Converted:9,Eff_Call:8,Commission:900},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:1,Lead_Type:"HT WB",Allocated:10,Converted:6,Eff_Call:5,Commission:600},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:2,Lead_Type:"SC+",Allocated:22,Converted:17,Eff_Call:15,Commission:1700},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:2,Lead_Type:"RR",Allocated:18,Converted:11,Eff_Call:9,Commission:1100},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:2,Lead_Type:"HT WB",Allocated:12,Converted:8,Eff_Call:7,Commission:800},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:3,Lead_Type:"SC+",Allocated:25,Converted:19,Eff_Call:17,Commission:1900},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:3,Lead_Type:"RR",Allocated:20,Converted:13,Eff_Call:11,Commission:1300},
+  {PRM_ID:"JCA10045",Name:"Ramesh Kumar",JC_Code:"BPM01",Lap:3,Lead_Type:"HT WB",Allocated:14,Converted:9,Eff_Call:8,Commission:900},
+  {PRM_ID:"JCA20078",Name:"Priya Nayak",JC_Code:"BPM02",Lap:1,Lead_Type:"SC+",Allocated:18,Converted:10,Eff_Call:9,Commission:1000},
+  {PRM_ID:"JCA20078",Name:"Priya Nayak",JC_Code:"BPM02",Lap:1,Lead_Type:"RR",Allocated:12,Converted:7,Eff_Call:6,Commission:700},
+  {PRM_ID:"JCA20078",Name:"Priya Nayak",JC_Code:"BPM02",Lap:2,Lead_Type:"SC+",Allocated:20,Converted:14,Eff_Call:12,Commission:1400},
+  {PRM_ID:"JCA20078",Name:"Priya Nayak",JC_Code:"BPM02",Lap:2,Lead_Type:"RR",Allocated:16,Converted:10,Eff_Call:9,Commission:1000},
+  {PRM_ID:"JCA20078",Name:"Priya Nayak",JC_Code:"BPM02",Lap:2,Lead_Type:"HT WB",Allocated:8,Converted:5,Eff_Call:4,Commission:500},
+];
+
+/* ---- FILE UPLOAD ---- */
+document.getElementById('file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('upload-label').textContent = '✅ ' + file.name;
+  document.getElementById('upload-zone').classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const wb = XLSX.read(ev.target.result, { type: 'binary' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      allData = XLSX.utils.sheet_to_json(ws);
+      normalizeKeys();
+    } catch(err) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === 'csv') {
+        const lines = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean);
+        const headers = lines[0].split(',').map(h => h.trim());
+        allData = lines.slice(1).map(line => {
+          const vals = line.split(',');
+          const obj = {};
+          headers.forEach((h, i) => { obj[h] = isNaN(vals[i]) ? (vals[i]||'').trim() : +vals[i]; });
+          return obj;
+        });
+        normalizeKeys();
+      }
+    }
+  };
+  reader.readAsBinaryString(file);
+});
+
+function normalizeKeys() {
+  const map = {
+    prm_id:'PRM_ID', prmid:'PRM_ID',
+    name:'Name',
+    jc_code:'JC_Code', jccode:'JC_Code',
+    lap:'Lap',
+    lead_type:'Lead_Type', leadtype:'Lead_Type',
+    allocated:'Allocated',
+    converted:'Converted',
+    eff_call:'Eff_Call', effcall:'Eff_Call', effective_call:'Eff_Call', effectivecall:'Eff_Call',
+    commission:'Commission'
+  };
+  allData = allData.map(row => {
+    const out = {};
+    Object.keys(row).forEach(k => {
+      const norm = k.toLowerCase().replace(/[\s\-]+/g, '_');
+      const mapped = map[norm] || map[norm.replace(/_/g,'')] || k;
+      out[mapped] = row[k];
+    });
+    return out;
+  });
+}
+
+function loadDemo() {
+  allData = DEMO;
+  document.getElementById('upload-label').textContent = '✅ demo_data.csv (demo loaded)';
+  document.getElementById('upload-zone').classList.add('has-file');
+  document.getElementById('prm-input').value = 'JCA10045';
+}
+
+/* ---- LOOKUP ---- */
+function lookupPRM() {
+  const prm = document.getElementById('prm-input').value.trim().toUpperCase();
+  const errEl = document.getElementById('error-msg');
+  if (!prm) { errEl.style.display='block'; errEl.textContent='⚠ Please enter your PRM ID.'; return; }
+  if (allData.length === 0) { errEl.style.display='block'; errEl.textContent='⚠ Please upload a data file first.'; return; }
+  const rows = allData.filter(r => String(r.PRM_ID || '').toUpperCase() === prm);
+  if (rows.length === 0) { errEl.style.display='block'; errEl.textContent='⚠ PRM ID not found in uploaded data.'; return; }
+  errEl.style.display = 'none';
+  renderDash(rows, prm);
+}
+
+document.getElementById('prm-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') lookupPRM();
+});
+
+/* ---- RENDER DASHBOARD ---- */
+function renderDash(rows, prm) {
+  const r0 = rows[0];
+  document.getElementById('jca-name').textContent = r0.Name || prm;
+  const laps = [...new Set(rows.map(r => r.Lap))].sort((a,b)=>a-b);
+  document.getElementById('jca-meta').textContent =
+    'PRM ID: ' + prm +
+    (r0.JC_Code ? ' · JC Code: ' + r0.JC_Code : '') +
+    ' · ' + laps.length + ' Lap(s) on record';
+
+  /* Summary metrics */
+  const totAlloc   = rows.reduce((s,r) => s+(+r.Allocated||0), 0);
+  const totConv    = rows.reduce((s,r) => s+(+r.Converted||0), 0);
+  const totEff     = rows.reduce((s,r) => s+(+r.Eff_Call||0), 0);
+  const totComm    = rows.reduce((s,r) => s+(+r.Commission||0), 0);
+  const convPct    = totAlloc > 0 ? Math.round(totConv / totAlloc * 100) : 0;
+
+  document.getElementById('metrics-grid').innerHTML = `
+    <div class="metric-card">
+      <div class="m-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Leads allocated
+      </div>
+      <div class="m-value">${totAlloc}</div>
+      <div class="m-sub">all lead types</div>
+    </div>
+    <div class="metric-card accent">
+      <div class="m-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Converted
+      </div>
+      <div class="m-value">${totConv}</div>
+      <div class="m-sub">activations</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Conversion %
+      </div>
+      <div class="m-value">${convPct}%</div>
+      <div class="m-sub">overall rate</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.26 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.17 1.1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.32a16 16 0 0 0 6 6l.45-.45a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+        Effective calls
+      </div>
+      <div class="m-value">${totEff}</div>
+      <div class="m-sub">&lt;40 sec excluded</div>
+    </div>
+    <div class="metric-card">
+      <div class="m-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Commission
+      </div>
+      <div class="m-value">₹${totComm.toLocaleString('en-IN')}</div>
+      <div class="m-sub">total earned</div>
+    </div>
+  `;
+
+  /* Lead type cards */
+  const ltConfig = [
+    { type:'SC+',  color:'#1a73e8', dotClass:'',    tagClass:'tag-sc' },
+    { type:'RR',   color:'#1e8b4c', dotClass:'',    tagClass:'tag-rr' },
+    { type:'HT WB',color:'#e74c3c', dotClass:'',    tagClass:'tag-ht' },
+  ];
+  document.getElementById('lt-grid').innerHTML = ltConfig.map(lc => {
+    const lr  = rows.filter(r => (r.Lead_Type||'').toUpperCase() === lc.type.toUpperCase());
+    const la  = lr.reduce((s,r) => s+(+r.Allocated||0), 0);
+    const lco = lr.reduce((s,r) => s+(+r.Converted||0), 0);
+    const le  = lr.reduce((s,r) => s+(+r.Eff_Call||0), 0);
+    const lp  = la > 0 ? Math.round(lco/la*100) : 0;
+    return `<div class="lt-card">
+      <div class="lt-head"><span class="dot" style="background:${lc.color}"></span>${lc.type}</div>
+      <div><span class="lt-alloc-num">${la}</span> <span class="lt-alloc-label">allocated</span></div>
+      <div class="lt-conv-line">${lco} converted · ${le} eff. calls</div>
+      <div class="mini-bar"><div class="mini-fill" style="width:${lp}%;background:${lc.color}"></div></div>
+      <div class="lt-pct">${lp}% conversion rate</div>
+    </div>`;
+  }).join('');
+
+  /* Lap table */
+  const tbody = document.getElementById('lap-tbody');
+  tbody.innerHTML = '';
+  laps.forEach(lap => {
+    const lapRows = rows.filter(r => r.Lap == lap);
+    lapRows.forEach((r, i) => {
+      const pct = (+r.Allocated) > 0 ? Math.round((+r.Converted)/(+r.Allocated)*100) : 0;
+      const barColor = pct >= 60 ? '#1e8b4c' : pct >= 40 ? '#1a73e8' : '#e67e22';
+      const lt = (r.Lead_Type||'').toUpperCase();
+      const tagCls = lt==='SC+' ? 'tag-sc' : lt==='RR' ? 'tag-rr' : 'tag-ht';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight:${i===0?600:400};color:${i===0?'var(--text1)':'var(--text3)'}">
+          ${i===0 ? '<b>Lap '+lap+'</b>' : ''}
+        </td>
+        <td><span class="tag ${tagCls}">${r.Lead_Type||'-'}</span></td>
+        <td>${r.Allocated||0}</td>
+        <td>${r.Converted||0}</td>
+        <td>${r.Eff_Call||0}</td>
+        <td>
+          <span class="pct-bar"><span class="pct-fill" style="width:${pct}%;background:${barColor}"></span></span>${pct}%
+        </td>
+        <td>₹${(+(r.Commission||0)).toLocaleString('en-IN')}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    /* Subtotal row */
+    const sum = lapRows.reduce((s,r)=>({
+      Allocated: s.Allocated+(+r.Allocated||0),
+      Converted: s.Converted+(+r.Converted||0),
+      Eff_Call:  s.Eff_Call +(+r.Eff_Call||0),
+      Commission:s.Commission+(+r.Commission||0)
+    }),{Allocated:0,Converted:0,Eff_Call:0,Commission:0});
+    const sp = sum.Allocated > 0 ? Math.round(sum.Converted/sum.Allocated*100) : 0;
+    const str = document.createElement('tr');
+    str.className = 'subtotal';
+    str.innerHTML = `
+      <td></td>
+      <td>Lap ${lap} total</td>
+      <td>${sum.Allocated}</td><td>${sum.Converted}</td><td>${sum.Eff_Call}</td>
+      <td>${sp}%</td>
+      <td>₹${sum.Commission.toLocaleString('en-IN')}</td>
+    `;
+    tbody.appendChild(str);
+  });
+
+  /* Chart */
+  const lapLabels = laps.map(l => 'Lap ' + l);
+  const datasets = [];
+  const ltDefs = [
+    { type:'SC+',   alloc:'rgba(26,115,232,0.25)', conv:'#1a73e8', border:'#1a73e8' },
+    { type:'RR',    alloc:'rgba(30,139,76,0.25)',  conv:'#1e8b4c', border:'#1e8b4c' },
+    { type:'HT WB', alloc:'rgba(231,76,60,0.25)',  conv:'#e74c3c', border:'#e74c3c' },
+  ];
+  ltDefs.forEach(ld => {
+    const allocData = laps.map(lap => rows.filter(r=>r.Lap==lap&&(r.Lead_Type||'').toUpperCase()===ld.type.toUpperCase()).reduce((s,r)=>s+(+r.Allocated||0),0));
+    const convData  = laps.map(lap => rows.filter(r=>r.Lap==lap&&(r.Lead_Type||'').toUpperCase()===ld.type.toUpperCase()).reduce((s,r)=>s+(+r.Converted||0),0));
+    datasets.push({ label:ld.type+' Allocated', data:allocData, backgroundColor:ld.alloc, borderColor:ld.border, borderWidth:1.5 });
+    datasets.push({ label:ld.type+' Converted', data:convData,  backgroundColor:ld.conv });
+  });
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
+  chartInst = new Chart(document.getElementById('lapChart'), {
+    type: 'bar',
+    data: { labels: lapLabels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { mode:'index', intersect:false } },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ autoSkip:false } },
+        y: { beginAtZero:true, grid:{ color:'rgba(128,128,128,0.1)' }, ticks:{ stepSize:5 } }
+      }
+    }
+  });
+  document.getElementById('chart-legend').innerHTML = [
+    { color:'#1a73e8', label:'SC+ allocated', outline:true },
+    { color:'#1a73e8', label:'SC+ converted' },
+    { color:'#1e8b4c', label:'RR allocated',  outline:true },
+    { color:'#1e8b4c', label:'RR converted' },
+    { color:'#e74c3c', label:'HT WB allocated', outline:true },
+    { color:'#e74c3c', label:'HT WB converted' },
+  ].map(l => `<span>
+    <span class="legend-sq" style="background:${l.outline?'transparent':l.color};border:${l.outline?'1.5px solid '+l.color:'none'}"></span>
+    ${l.label}
+  </span>`).join('');
+
+  /* Switch screens */
+  document.getElementById('screen-lookup').classList.remove('active');
+  document.getElementById('screen-dash').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function goBack() {
+  document.getElementById('screen-dash').classList.remove('active');
+  document.getElementById('screen-lookup').classList.add('active');
+}
+</script>
+</body>
+</html>
