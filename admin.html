@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JCA Portal — Admin Upload</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;
+  --surface:#161b22;
+  --surface2:#21262d;
+  --surface3:#30363d;
+  --border:#30363d;
+  --border2:#484f58;
+  --text1:#e6edf3;
+  --text2:#8b949e;
+  --text3:#484f58;
+  --blue:#2f81f7;
+  --blue-dim:rgba(47,129,247,0.15);
+  --green:#3fb950;
+  --green-dim:rgba(63,185,80,0.15);
+  --orange:#d29922;
+  --orange-dim:rgba(210,153,34,0.15);
+  --red:#f85149;
+  --red-dim:rgba(248,81,73,0.15);
+  --radius:8px;
+  --radius-lg:12px;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text1);min-height:100vh;display:flex;flex-direction:column}
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;gap:16px}
+.logo-badge{background:var(--blue);color:#fff;font-weight:700;font-size:13px;padding:4px 12px;border-radius:6px;letter-spacing:0.5px}
+.header-title{font-size:15px;font-weight:600;color:var(--text1)}
+.header-sub{font-size:12px;color:var(--text3);margin-left:8px;padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
+/* MAIN */
+.main{flex:1;max-width:680px;margin:0 auto;padding:40px 16px 60px;width:100%}
+/* STEP CARD */
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;transition:border-color .2s}
+.step-card.active{border-color:var(--blue)}
+.step-card.done{border-color:var(--green)}
+.step-head{padding:20px 24px;display:flex;align-items:center;gap:14px}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);flex-shrink:0;transition:background .2s,border-color .2s,color .2s}
+.step-card.active .step-num{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+.step-card.done .step-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.step-info h3{font-size:14px;font-weight:600;color:var(--text1)}
+.step-info p{font-size:12px;color:var(--text2);margin-top:2px}
+.step-body{padding:0 24px 24px;border-top:1px solid var(--border)}
+/* INPUTS */
+.field-group{margin-bottom:16px;margin-top:16px}
+.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+input[type=text],input[type=password]{width:100%;height:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:14px;font-family:var(--mono);color:var(--text1);outline:none;transition:border-color .15s}
+input[type=text]:focus,input[type=password]:focus{border-color:var(--blue)}
+.hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+.hint a{color:var(--blue);text-decoration:none}
+.hint a:hover{text-decoration:underline}
+/* UPLOAD ZONE */
+.upload-zone{position:relative;border:2px dashed var(--border2);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:16px}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-dim)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone .uz-icon{font-size:28px;margin-bottom:8px}
+.upload-zone .uz-text{font-size:13px;color:var(--text2);font-weight:500}
+.upload-zone .uz-hint{font-size:11px;color:var(--text3);margin-top:4px}
+.upload-zone.has-file{border-color:var(--green);background:var(--green-dim)}
+.upload-zone.has-file .uz-text{color:var(--green)}
+/* PREVIEW TABLE */
+.preview-wrap{margin-top:16px;display:none}
+.preview-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+th{background:var(--surface2);padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);font-family:var(--mono);font-size:11px}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
+.badge-sc{background:var(--blue-dim);color:var(--blue)}
+.badge-rr{background:var(--green-dim);color:var(--green)}
+.badge-ht{background:var(--orange-dim);color:var(--orange)}
+/* STATS ROW */
+.stats-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.stat-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.stat-pill strong{color:var(--text1);font-weight:700}
+/* BTN */
+.btn-upload{width:100%;height:44px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;margin-top:20px;letter-spacing:0.3px}
+.btn-upload:hover{opacity:.88}
+.btn-upload:disabled{opacity:.4;cursor:not-allowed}
+/* PROGRESS */
+.progress-wrap{margin-top:20px;display:none}
+.progress-bar{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s;width:0%}
+.progress-text{font-size:12px;color:var(--text2);margin-top:8px}
+/* SUCCESS BOX */
+.success-box{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius);padding:16px 20px;margin-top:20px;display:none}
+.success-box .s-title{font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px}
+.success-box .s-url{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;word-break:break-all;margin-bottom:10px;cursor:pointer;transition:background .15s}
+.success-box .s-url:hover{background:var(--surface3)}
+.success-box .s-copy-btn{height:32px;padding:0 16px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.success-box .s-info{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6}
+/* ERROR */
+.error-box{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius);padding:12px 16px;margin-top:12px;font-size:12px;color:var(--red);display:none}
+/* FORMAT CARD */
+.format-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:16px}
+.format-card p{font-size:12px;color:var(--text2);margin-bottom:10px}
+.format-card code{font-family:var(--mono);font-size:11px;color:var(--text1);display:block;line-height:2;overflow-x:auto;white-space:pre}
+.col-tag{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-size:10px;margin-right:4px;margin-bottom:4px;color:var(--text1)}
+/* FOOTER */
+footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo-badge">JIO</span>
+  <span class="header-title">JCA Performance Portal</span>
+  <span class="header-sub">Admin Upload</span>
+</div>
+
+<div class="main">
+
+  <!-- STEP 1: JSONBin Config -->
+  <div class="step-card active" id="card1">
+    <div class="step-head">
+      <div class="step-num" id="sn1">1</div>
+      <div class="step-info">
+        <h3>Configure JSONBin</h3>
+        <p>One-time setup — enter your JSONBin credentials</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="field-group">
+        <div class="field-label">JSONBin Master Key</div>
+        <input type="password" id="master-key" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxx">
+        <div class="hint">Get your free key at <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → Sign up → API Keys → Master Key</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Bin ID <span style="color:var(--text3);font-weight:400;text-transform:none">(leave blank to auto-create on first upload)</span></div>
+        <input type="text" id="bin-id" placeholder="e.g. 665abc1234def5678" style="font-family:var(--mono)">
+        <div class="hint">After first upload, the Bin ID will be shown — save it for future uploads to the same bin.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Upload Excel -->
+  <div class="step-card" id="card2">
+    <div class="step-head">
+      <div class="step-num" id="sn2">2</div>
+      <div class="step-info">
+        <h3>Upload today's Excel file</h3>
+        <p>JCA performance data for all PRM IDs</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="format-card">
+        <p>📋 Required columns in your Excel / CSV:</p>
+        <div>
+          <span class="col-tag">PRM_ID</span>
+          <span class="col-tag">Name</span>
+          <span class="col-tag">JC_Code</span>
+          <span class="col-tag">Lap</span>
+          <span class="col-tag">Lead_Type</span>
+          <span class="col-tag">Allocated</span>
+          <span class="col-tag">Converted</span>
+          <span class="col-tag">Eff_Call</span>
+          <span class="col-tag">Commission</span>
+        </div>
+        <code style="margin-top:10px">Lead_Type values: SC+ | RR | HT WB</code>
+      </div>
+
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
+        <div class="uz-icon">📂</div>
+        <div class="uz-text" id="upload-label">Click to select Excel / CSV file</div>
+        <div class="uz-hint">.xlsx · .xls · .csv supported</div>
+      </div>
+
+      <div class="preview-wrap" id="preview-wrap">
+        <div class="stats-row" id="stats-row"></div>
+        <div class="preview-label" style="margin-top:16px">Preview (first 5 rows)</div>
+        <div class="table-scroll"><table id="preview-table"></table></div>
+      </div>
+
+      <div class="error-box" id="parse-error"></div>
+
+      <button class="btn-upload" id="upload-btn" disabled onclick="uploadToJSONBin()">
+        ⬆ Push to JSONBin
+      </button>
+
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-text" id="progress-text">Uploading…</div>
+      </div>
+
+      <div class="success-box" id="success-box">
+        <div class="s-title">✅ Data uploaded successfully</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Share this link with your JCAs:</div>
+        <div class="s-url" id="jca-url" onclick="copyURL()"></div>
+        <button class="s-copy-btn" onclick="copyURL()">Copy link</button>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2)">Bin ID (save for future uploads):</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text1);margin-top:4px" id="bin-id-display"></div>
+        <div class="s-info">JCAs open the link → enter their PRM ID → view their own dashboard. Data updates instantly when you re-upload.</div>
+      </div>
+
+      <div class="error-box" id="upload-error"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Jio · JCA Performance Portal · Admin Panel · Internal use only</footer>
+
+<script>
+let parsedData = [];
+
+/* ---- FILE PARSE ---- */
+document.getElementById('file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('upload-label').textContent = '✅ ' + file.name;
+  document.getElementById('upload-zone').classList.add('has-file');
+  document.getElementById('parse-error').style.display = 'none';
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const wb = XLSX.read(ev.target.result, { type: 'binary' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      parsedData = XLSX.utils.sheet_to_json(ws);
+      parsedData = normalizeKeys(parsedData);
+      showPreview();
+      document.getElementById('card2').classList.add('active');
+      document.getElementById('upload-btn').disabled = false;
+    } catch(err) {
+      showParseError('Could not read file: ' + err.message);
+    }
+  };
+  reader.onerror = () => showParseError('Failed to read file.');
+  reader.readAsBinaryString(file);
+});
+
+function normalizeKeys(data) {
+  const map = {
+    prm_id:'PRM_ID', prmid:'PRM_ID',
+    name:'Name',
+    jc_code:'JC_Code', jccode:'JC_Code',
+    lap:'Lap',
+    lead_type:'Lead_Type', leadtype:'Lead_Type',
+    allocated:'Allocated',
+    converted:'Converted',
+    eff_call:'Eff_Call', effcall:'Eff_Call',
+    effective_call:'Eff_Call', effectivecall:'Eff_Call',
+    commission:'Commission'
+  };
+  return data.map(row => {
+    const out = {};
+    Object.keys(row).forEach(k => {
+      const nk = map[k.toLowerCase().replace(/[\s\-]+/g,'_')] ||
+                 map[k.toLowerCase().replace(/[\s\-_]+/g,'')] || k;
+      out[nk] = row[k];
+    });
+    return out;
+  });
+}
+
+function showPreview() {
+  const pw = document.getElementById('preview-wrap');
+  pw.style.display = 'block';
+  // Stats
+  const prms = [...new Set(parsedData.map(r => r.PRM_ID))];
+  const laps = [...new Set(parsedData.map(r => r.Lap))];
+  const types = [...new Set(parsedData.map(r => r.Lead_Type))];
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-pill">👤 <strong>${prms.length}</strong> JCAs</div>
+    <div class="stat-pill">📋 <strong>${parsedData.length}</strong> rows</div>
+    <div class="stat-pill">🔄 <strong>${laps.length}</strong> Laps</div>
+    <div class="stat-pill">🏷 <strong>${types.join(', ')}</strong></div>
+  `;
+  // Table preview
+  const cols = ['PRM_ID','Name','JC_Code','Lap','Lead_Type','Allocated','Converted','Eff_Call','Commission'];
+  const tbl = document.getElementById('preview-table');
+  tbl.innerHTML = '';
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr>' + cols.map(c=>`<th>${c}</th>`).join('') + '</tr>';
+  tbl.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  parsedData.slice(0,5).forEach(row => {
+    const tr = document.createElement('tr');
+    cols.forEach(c => {
+      const td = document.createElement('td');
+      if (c === 'Lead_Type') {
+        const lt = (row[c]||'').toUpperCase();
+        const cls = lt==='SC+' ? 'badge-sc' : lt==='RR' ? 'badge-rr' : 'badge-ht';
+        td.innerHTML = `<span class="badge ${cls}">${row[c]||'-'}</span>`;
+      } else {
+        td.textContent = row[c] !== undefined ? row[c] : '-';
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+}
+
+function showParseError(msg) {
+  const el = document.getElementById('parse-error');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+}
+
+/* ---- UPLOAD TO JSONBIN ---- */
+async function uploadToJSONBin() {
+  const masterKey = document.getElementById('master-key').value.trim();
+  const binId = document.getElementById('bin-id').value.trim();
+
+  if (!masterKey) {
+    showUploadError('Please enter your JSONBin Master Key in Step 1.');
+    return;
+  }
+  if (parsedData.length === 0) {
+    showUploadError('No data to upload. Please select a file first.');
+    return;
+  }
+
+  document.getElementById('upload-btn').disabled = true;
+  document.getElementById('success-box').style.display = 'none';
+  document.getElementById('upload-error').style.display = 'none';
+
+  const progressWrap = document.getElementById('progress-wrap');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  progressWrap.style.display = 'block';
+  progressFill.style.width = '30%';
+  progressText.textContent = 'Connecting to JSONBin…';
+
+  const payload = {
+    updated: new Date().toISOString(),
+    records: parsedData
+  };
+
+  try {
+    let url, method, headers;
+    if (binId) {
+      url = `https://api.jsonbin.io/v3/b/${binId}`;
+      method = 'PUT';
+      headers = { 'Content-Type':'application/json', 'X-Master-Key': masterKey };
+    } else {
+      url = 'https://api.jsonbin.io/v3/b';
+      method = 'POST';
+      headers = {
+        'Content-Type':'application/json',
+        'X-Master-Key': masterKey,
+        'X-Bin-Name': 'jca-portal-data',
+        'X-Bin-Private': 'false'
+      };
+    }
+
+    progressFill.style.width = '60%';
+    progressText.textContent = 'Uploading data…';
+
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    progressFill.style.width = '90%';
+
+    if (!res.ok) {
+      const errData = await res.json().catch(()=>({}));
+      throw new Error(errData.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const newBinId = data.metadata?.id || binId;
+    progressFill.style.width = '100%';
+    progressText.textContent = 'Done!';
+
+    // Save bin ID back
+    document.getElementById('bin-id').value = newBinId;
+    document.getElementById('bin-id-display').textContent = newBinId;
+    document.getElementById('sn1').textContent = '✓';
+    document.getElementById('card1').classList.remove('active');
+    document.getElementById('card1').classList.add('done');
+    document.getElementById('card2').classList.add('done');
+
+    // Build JCA URL
+    const baseURL = window.location.href.replace('admin.html','index.html');
+    const jcaLink = `${baseURL}?bin=${newBinId}`;
+    document.getElementById('jca-url').textContent = jcaLink;
+    document.getElementById('success-box').style.display = 'block';
+
+    setTimeout(() => { progressWrap.style.display = 'none'; }, 1200);
+
+  } catch(err) {
+    progressWrap.style.display = 'none';
+    document.getElementById('upload-btn').disabled = false;
+    showUploadError('Upload failed: ' + err.message + '. Check your Master Key and internet connection.');
+  }
+}
+
+function showUploadError(msg) {
+  const el = document.getElementById('upload-error');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+}
+
+function copyURL() {
+  const url = document.getElementById('jca-url').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.querySelector('.s-copy-btn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = 'Copy link', 2000);
+  });
+}
+
+// Activate step 1 on key input
+document.getElementById('master-key').addEventListener('input', function() {
+  if (this.value.trim()) {
+    document.getElementById('card1').classList.add('active');
+  }
+});
+</script>
+</body>
+</html>
