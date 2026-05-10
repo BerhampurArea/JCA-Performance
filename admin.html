@@ -3,383 +3,393 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JCA Portal — Admin Upload</title>
+<title>JCA Portal — Admin Setup</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--surface3:#30363d;
   --border:#30363d;--border2:#484f58;
   --text1:#e6edf3;--text2:#8b949e;--text3:#484f58;
-  --blue:#2f81f7;--blue-dim:rgba(47,129,247,0.15);
-  --green:#3fb950;--green-dim:rgba(63,185,80,0.15);
-  --orange:#d29922;--orange-dim:rgba(210,153,34,0.15);
-  --red:#f85149;--red-dim:rgba(248,81,73,0.15);
-  --yellow:#e3b341;--yellow-dim:rgba(227,179,65,0.15);
-  --radius:8px;--radius-lg:12px;
-  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --blue:#2f81f7;--blue-dim:rgba(47,129,247,.15);
+  --green:#3fb950;--green-dim:rgba(63,185,80,.15);
+  --orange:#d29922;--orange-dim:rgba(210,153,34,.15);
+  --red:#f85149;--red-dim:rgba(248,81,73,.15);
+  --yellow:#e3b341;--yellow-dim:rgba(227,179,65,.15);
+  --purple:#a371f7;--purple-dim:rgba(163,113,247,.15);
+  --r:8px;--rl:12px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text1);min-height:100vh;display:flex;flex-direction:column}
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;gap:16px}
-.logo-badge{background:var(--blue);color:#fff;font-weight:700;font-size:13px;padding:4px 12px;border-radius:6px;letter-spacing:.5px}
-.header-title{font-size:15px;font-weight:600}
-.header-sub{font-size:12px;color:var(--text3);padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
-.main{flex:1;max-width:700px;margin:0 auto;padding:40px 16px 60px;width:100%}
-.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;transition:border-color .2s}
-.step-card.active{border-color:var(--blue)}
-.step-card.done{border-color:var(--green)}
-.step-card.warn{border-color:var(--yellow)}
-.step-head{padding:18px 24px;display:flex;align-items:center;gap:14px}
-.step-num{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);flex-shrink:0;transition:all .2s}
-.step-card.active .step-num{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
-.step-card.done .step-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
-.step-card.warn .step-num{background:var(--yellow-dim);border-color:var(--yellow);color:var(--yellow)}
-.step-info h3{font-size:14px;font-weight:600}
-.step-info p{font-size:12px;color:var(--text2);margin-top:2px}
-.step-body{padding:0 24px 24px;border-top:1px solid var(--border)}
-.field-group{margin-top:16px}
-.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:block}
-input[type=text],input[type=password],select{width:100%;height:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:13px;font-family:var(--mono);color:var(--text1);outline:none;transition:border-color .15s;-webkit-appearance:none}
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);height:58px;padding:0 28px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:99}
+.jio{background:var(--blue);color:#fff;font-weight:700;font-size:12px;padding:3px 10px;border-radius:5px;letter-spacing:.5px}
+.hdr-t{font-size:15px;font-weight:600}
+.hdr-s{font-size:11px;color:var(--text3);padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
+.main{flex:1;max-width:720px;margin:0 auto;padding:36px 16px 60px;width:100%}
+/* STEP CARD */
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:14px;overflow:hidden;transition:border-color .2s}
+.sc.active{border-color:var(--blue)}
+.sc.done{border-color:var(--green)}
+.sc.warn{border-color:var(--yellow)}
+.sc-head{padding:16px 22px;display:flex;align-items:center;gap:12px}
+.sc-num{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;transition:all .2s}
+.sc.active .sc-num{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+.sc.done .sc-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.sc.warn .sc-num{background:var(--yellow-dim);border-color:var(--yellow);color:var(--yellow)}
+.sc-info h3{font-size:13px;font-weight:600}
+.sc-info p{font-size:11px;color:var(--text2);margin-top:1px}
+.sc-body{padding:0 22px 22px;border-top:1px solid var(--border)}
+/* INPUTS */
+.fg{margin-top:14px}
+.fl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+input[type=text],input[type=url],select{width:100%;height:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:0 12px;font-size:13px;font-family:var(--mono);color:var(--text1);outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
 input:focus,select:focus{border-color:var(--blue)}
-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:12px;font-family:var(--mono);color:var(--text1);outline:none;resize:vertical;transition:border-color .15s;min-height:60px}
+textarea:focus{border-color:var(--blue)}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
 select option{background:#21262d}
 .hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5}
-.hint a{color:var(--blue);text-decoration:none}
-.hint a:hover{text-decoration:underline}
-.upload-zone{position:relative;border:2px dashed var(--border2);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:16px}
-.upload-zone:hover{border-color:var(--blue);background:var(--blue-dim)}
-.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-zone .uz-icon{font-size:28px;margin-bottom:8px}
-.upload-zone .uz-text{font-size:13px;color:var(--text2);font-weight:500}
-.upload-zone .uz-hint{font-size:11px;color:var(--text3);margin-top:4px}
-.upload-zone.has-file{border-color:var(--green);background:var(--green-dim)}
-.upload-zone.has-file .uz-text{color:var(--green)}
-.raw-preview{margin-top:16px;display:none}
-.section-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
-.table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+.hint a,.link{color:var(--blue);text-decoration:none}
+.hint a:hover,.link:hover{text-decoration:underline}
+/* STEPS VISUAL */
+.steps-visual{display:flex;flex-direction:column;gap:0;margin-top:14px}
+.sv-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;position:relative}
+.sv-row:not(:last-child)::after{content:'';position:absolute;left:14px;top:38px;bottom:0;width:1px;background:var(--border)}
+.sv-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;position:relative;z-index:1}
+.sv-icon.blue{background:var(--blue-dim);border:1px solid var(--blue)}
+.sv-icon.green{background:var(--green-dim);border:1px solid var(--green)}
+.sv-icon.orange{background:var(--orange-dim);border:1px solid var(--orange)}
+.sv-icon.purple{background:var(--purple-dim);border:1px solid var(--purple)}
+.sv-text{padding-top:4px}
+.sv-text strong{font-size:13px;font-weight:600;color:var(--text1);display:block}
+.sv-text span{font-size:12px;color:var(--text2);line-height:1.5;display:block;margin-top:2px}
+/* UPLOAD ZONE */
+.uz{position:relative;border:2px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:14px}
+.uz:hover{border-color:var(--blue);background:var(--blue-dim)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-icon{font-size:26px;margin-bottom:6px}
+.uz-t{font-size:13px;color:var(--text2);font-weight:500}
+.uz-h{font-size:11px;color:var(--text3);margin-top:3px}
+.uz.has-file{border-color:var(--green);background:var(--green-dim)}
+.uz.has-file .uz-t{color:var(--green)}
+/* TABLE */
+.tscroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);margin-top:10px}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
-th{background:var(--surface2);padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);font-family:var(--mono);font-size:11px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+th{background:var(--surface2);padding:7px 11px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:7px 11px;border-bottom:1px solid var(--border);color:var(--text1);font-family:var(--mono);font-size:11px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
 tr:last-child td{border-bottom:none}
+.chip{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;font-size:11px;font-family:var(--mono);color:var(--text1);margin:2px}
 .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
-.badge-sc{background:var(--blue-dim);color:var(--blue)}
-.badge-rr{background:var(--green-dim);color:var(--green)}
-.badge-ht{background:var(--orange-dim);color:var(--orange)}
-.stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.stat-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px}
-.stat-pill strong{color:var(--text1);font-weight:700}
-.mapper-grid{display:grid;grid-template-columns:1fr 26px 1fr;gap:8px 8px;align-items:center}
-.map-target{font-size:12px;font-weight:600;font-family:var(--mono);background:var(--surface3);border-radius:5px;padding:7px 10px;color:var(--text1)}
-.map-arrow{text-align:center;color:var(--text3);font-size:15px}
-.btn-primary{height:44px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;letter-spacing:.3px;width:100%;margin-top:16px}
-.btn-primary:hover{opacity:.88}
-.btn-primary:disabled{opacity:.4;cursor:not-allowed}
-.progress-wrap{margin-top:16px;display:none}
-.progress-bar{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;width:0%}
-.progress-text{font-size:12px;color:var(--text2);margin-top:7px}
-.success-box{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius);padding:18px 20px;margin-top:16px;display:none}
-.s-title{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px}
-.s-url{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;word-break:break-all;margin-bottom:10px;line-height:1.5}
-.s-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.s-btn{height:34px;padding:0 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
-.s-btn-green{background:var(--green);color:#fff}
-.s-btn-grey{background:var(--surface3);color:var(--text1)}
-.s-info{font-size:11px;color:var(--text2);line-height:1.7;margin-top:10px}
-.bin-val{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;display:inline-block;margin-top:4px;word-break:break-all}
-.error-box{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius);padding:11px 15px;margin-top:12px;font-size:12px;color:var(--red);display:none;line-height:1.6}
-.info-box{background:var(--blue-dim);border:1px solid rgba(47,129,247,.35);border-radius:var(--radius);padding:12px 15px;margin-top:14px;font-size:12px;color:var(--text2);line-height:1.7}
-.chip{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;font-size:11px;font-family:var(--mono);color:var(--text1);margin:2px}
+.b-sc{background:var(--blue-dim);color:var(--blue)}
+.b-rr{background:var(--green-dim);color:var(--green)}
+.b-ht{background:var(--orange-dim);color:var(--orange)}
+/* MAPPER */
+.mg{display:grid;grid-template-columns:1fr 22px 1fr;gap:7px 8px;align-items:center}
+.mt{font-size:12px;font-weight:600;font-family:var(--mono);background:var(--surface3);border-radius:5px;padding:6px 10px;color:var(--text1)}
+.ma{text-align:center;color:var(--text3);font-size:14px}
+/* STATS */
+.sp{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.spill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.spill strong{color:var(--text1);font-weight:700}
+/* BUTTONS */
+.btn-p{height:44px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;width:100%;margin-top:14px;letter-spacing:.2px}
+.btn-p:hover{opacity:.88}
+.btn-p:disabled{opacity:.4;cursor:not-allowed}
+.btn-s{height:36px;padding:0 14px;background:var(--surface2);color:var(--text1);border:1px solid var(--border2);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s}
+.btn-s:hover{background:var(--surface3)}
+/* PROGRESS */
+.pw{margin-top:14px;display:none}
+.pb{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;width:0%}
+.pt{font-size:12px;color:var(--text2);margin-top:6px}
+/* SUCCESS */
+.sbox{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r);padding:16px 18px;margin-top:14px;display:none}
+.s-t{font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px}
+.s-url{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;word-break:break-all;margin-bottom:8px;line-height:1.5}
+.s-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.sbtn{height:32px;padding:0 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.sbtn-g{background:var(--green);color:#fff}
+.sbtn-d{background:var(--surface3);color:var(--text1)}
+.s-inf{font-size:11px;color:var(--text2);line-height:1.7;margin-top:8px}
+/* ERROR / INFO */
+.ebox{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--red);display:none;line-height:1.6}
+.ibox{background:var(--blue-dim);border:1px solid rgba(47,129,247,.3);border-radius:var(--r);padding:12px 14px;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.7}
+/* SHEET GUIDE BOX */
+.guide-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-top:14px}
+.guide-box code{font-family:var(--mono);font-size:11px;background:var(--surface3);padding:2px 6px;border-radius:3px;color:var(--text1);display:inline-block;margin-top:3px;word-break:break-all}
 footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <span class="logo-badge">JIO</span>
-  <span class="header-title">JCA Performance Portal</span>
-  <span class="header-sub">Admin Upload</span>
+<div class="hdr">
+  <span class="jio">JIO</span>
+  <span class="hdr-t">JCA Performance Portal</span>
+  <span class="hdr-s">Admin</span>
 </div>
 
 <div class="main">
 
-  <!-- STEP 1 -->
-  <div class="step-card active" id="card1">
-    <div class="step-head">
-      <div class="step-num" id="sn1">1</div>
-      <div class="step-info"><h3>JSONBin Setup</h3><p>One-time credentials — never stored anywhere</p></div>
+<!-- ── STEP 1: Upload Excel ─────────────────────────────────────────── -->
+<div class="sc active" id="c1">
+  <div class="sc-head">
+    <div class="sc-num" id="n1">1</div>
+    <div class="sc-info"><h3>Upload your Excel / CSV file</h3><p>Any column names — you'll map them next</p></div>
+  </div>
+  <div class="sc-body">
+    <div class="uz" id="uz">
+      <input type="file" id="fi" accept=".xlsx,.xls,.csv">
+      <div class="uz-icon">📂</div>
+      <div class="uz-t" id="ul">Click to select Excel / CSV</div>
+      <div class="uz-h">.xlsx · .xls · .csv — any size</div>
     </div>
-    <div class="step-body">
-      <div class="info-box">
-        <strong>How to get your free JSONBin Master Key:</strong><br>
-        1. Visit <a href="https://jsonbin.io" target="_blank" style="color:var(--blue)">jsonbin.io</a> → Sign up free (takes 30 seconds)<br>
-        2. After login → click <strong>API Keys</strong> in sidebar → copy <strong>Master Key</strong><br>
-        3. Paste below. Leave Bin ID blank on first upload — it will be auto-created.
-      </div>
-      <div class="field-group">
-        <label class="field-label">Master Key</label>
-        <input type="password" id="master-key" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Bin ID <span style="color:var(--text3);font-weight:400;text-transform:none;font-size:11px">(blank on first upload — paste saved ID on future uploads)</span></label>
-        <input type="text" id="bin-id" placeholder="e.g. 665abc1234def5678" spellcheck="false">
-      </div>
+    <div class="ebox" id="pe"></div>
+    <div id="raw-wrap" style="display:none">
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:14px;margin-bottom:6px">Columns in your file</div>
+      <div id="col-chips"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:12px;margin-bottom:6px">Preview (first 3 rows)</div>
+      <div class="tscroll"><table id="rt"></table></div>
     </div>
   </div>
+</div>
 
-  <!-- STEP 2 -->
-  <div class="step-card" id="card2">
-    <div class="step-head">
-      <div class="step-num" id="sn2">2</div>
-      <div class="step-info"><h3>Upload Excel / CSV</h3><p>Any column names are fine — you'll map them in Step 3</p></div>
-    </div>
-    <div class="step-body">
-      <div class="upload-zone" id="upload-zone">
-        <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
-        <div class="uz-icon">📂</div>
-        <div class="uz-text" id="upload-label">Click to select Excel / CSV file</div>
-        <div class="uz-hint">.xlsx · .xls · .csv accepted</div>
-      </div>
-      <div class="error-box" id="parse-error"></div>
-      <div class="raw-preview" id="raw-preview">
-        <div class="section-label" style="margin-top:16px">Columns found in your file</div>
-        <div id="found-cols"></div>
-        <div class="section-label" style="margin-top:14px">File preview (first 3 rows)</div>
-        <div class="table-scroll"><table id="raw-table"></table></div>
-      </div>
+<!-- ── STEP 2: Map Columns ──────────────────────────────────────────── -->
+<div class="sc" id="c2" style="display:none">
+  <div class="sc-head">
+    <div class="sc-num" id="n2">2</div>
+    <div class="sc-info"><h3>Map columns</h3><p>Match your file columns to portal fields</p></div>
+  </div>
+  <div class="sc-body">
+    <div style="font-size:12px;color:var(--text2);margin-top:14px;margin-bottom:12px">Auto-matched where possible. Correct any mismatches, then click Apply.</div>
+    <div class="mg" id="mg"></div>
+    <button class="btn-p" onclick="applyMap()">✅ Apply mapping →</button>
+    <div class="ebox" id="me"></div>
+    <div id="mp" style="display:none">
+      <div class="sp" id="sp" style="margin-top:14px"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Mapped preview (first 5 rows)</div>
+      <div class="tscroll"><table id="mt"></table></div>
     </div>
   </div>
+</div>
 
-  <!-- STEP 3 -->
-  <div class="step-card" id="card3" style="display:none">
-    <div class="step-head">
-      <div class="step-num" id="sn3">3</div>
-      <div class="step-info"><h3>Map columns</h3><p>Tell the portal which column means what</p></div>
-    </div>
-    <div class="step-body">
-      <div style="font-size:12px;color:var(--text2);margin-top:14px;margin-bottom:14px">
-        Auto-matched where possible. Fix any wrong ones, then click Apply.
-      </div>
-      <div class="mapper-grid" id="mapper-grid"></div>
-      <button class="btn-primary" onclick="applyMapping()">✅ Apply mapping & preview →</button>
-      <div class="error-box" id="map-error"></div>
-      <div id="mapped-preview" style="display:none">
-        <div class="stats-row" id="stats-row" style="margin-top:16px"></div>
-        <div class="section-label">Mapped preview (first 5 rows)</div>
-        <div class="table-scroll"><table id="mapped-table"></table></div>
-      </div>
-    </div>
+<!-- ── STEP 3: Paste to Google Sheets ──────────────────────────────── -->
+<div class="sc" id="c3" style="display:none">
+  <div class="sc-head">
+    <div class="sc-num" id="n3">3</div>
+    <div class="sc-info"><h3>Paste data into Google Sheets</h3><p>Copy the mapped data → paste in a new sheet</p></div>
   </div>
+  <div class="sc-body">
 
-  <!-- STEP 4 -->
-  <div class="step-card" id="card4" style="display:none">
-    <div class="step-head">
-      <div class="step-num" id="sn4">4</div>
-      <div class="step-info"><h3>Push to cloud</h3><p>Upload to JSONBin — JCAs access via shared link</p></div>
+    <div class="ibox" style="margin-top:14px">
+      📋 Click <strong>"Copy mapped data"</strong> below, then follow the 3 steps to publish on Google Sheets.
     </div>
-    <div class="step-body">
-      <button class="btn-primary" id="upload-btn" onclick="uploadToJSONBin()">⬆ Push to JSONBin</button>
-      <div class="progress-wrap" id="progress-wrap">
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="progress-text" id="progress-text">Connecting…</div>
-      </div>
-      <div class="error-box" id="upload-error"></div>
-      <div class="success-box" id="success-box">
-        <div class="s-title">✅ Data pushed successfully!</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:7px">Share this link with all JCAs:</div>
-        <div class="s-url" id="jca-url"></div>
-        <div class="s-row">
-          <button class="s-btn s-btn-green" onclick="copyURL()">📋 Copy JCA link</button>
-          <button class="s-btn s-btn-grey" onclick="copyBinId()">Copy Bin ID</button>
+
+    <button class="btn-p" id="copy-btn" onclick="copyMappedData()" style="background:var(--green)">📋 Copy mapped data to clipboard</button>
+
+    <div class="steps-visual" style="margin-top:16px">
+      <div class="sv-row">
+        <div class="sv-icon blue">1️⃣</div>
+        <div class="sv-text">
+          <strong>Open Google Sheets</strong>
+          <span>Go to <a href="https://sheets.google.com" target="_blank" class="link">sheets.google.com</a> → create a <strong>New spreadsheet</strong></span>
         </div>
-        <div style="font-size:12px;color:var(--text2)">Bin ID — save this for future daily uploads:</div>
-        <div class="bin-val" id="bin-id-display"></div>
-        <div class="s-info">
-          👤 JCAs open the link → type their PRM ID → see their dashboard instantly.<br>
-          🔁 Next upload: paste saved Bin ID in Step 1 so same link always works for JCAs.
+      </div>
+      <div class="sv-row">
+        <div class="sv-icon green">2️⃣</div>
+        <div class="sv-text">
+          <strong>Paste the data</strong>
+          <span>Click cell <strong>A1</strong> → press <strong>Ctrl+V</strong> (or Cmd+V on Mac) to paste all rows</span>
+        </div>
+      </div>
+      <div class="sv-row">
+        <div class="sv-icon orange">3️⃣</div>
+        <div class="sv-text">
+          <strong>Publish as CSV</strong>
+          <span>Go to <strong>File → Share → Publish to web</strong><br>
+          Select: <strong>Sheet1</strong> · Format: <strong>Comma-separated values (.csv)</strong><br>
+          Click <strong>Publish</strong> → copy the URL shown</span>
+        </div>
+      </div>
+      <div class="sv-row">
+        <div class="sv-icon purple">4️⃣</div>
+        <div class="sv-text">
+          <strong>Paste the URL below in Step 4</strong>
+          <span>The URL looks like:<br>
+          <code style="font-family:var(--mono);font-size:10px;background:var(--surface3);padding:2px 5px;border-radius:3px;word-break:break-all">https://docs.google.com/spreadsheets/d/…/pub?gid=0&single=true&output=csv</code></span>
         </div>
       </div>
     </div>
+
+    <div class="ebox" id="ce"></div>
+    <div class="guide-box" style="margin-top:6px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">💡 For <strong>daily updates</strong>: just paste new data into the same sheet and re-publish (or it auto-refreshes if already published). The JCA link never changes.</div>
+    </div>
+
+    <button class="btn-p" onclick="nextStep3()" style="margin-top:14px">I've published the sheet → Next →</button>
   </div>
+</div>
+
+<!-- ── STEP 4: Enter Sheet URL ──────────────────────────────────────── -->
+<div class="sc" id="c4" style="display:none">
+  <div class="sc-head">
+    <div class="sc-num" id="n4">4</div>
+    <div class="sc-info"><h3>Enter Google Sheets CSV URL</h3><p>Paste the published CSV link here</p></div>
+  </div>
+  <div class="sc-body">
+    <div class="fg">
+      <label class="fl">Google Sheets CSV URL</label>
+      <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv" spellcheck="false">
+      <div class="hint">From Google Sheets → File → Share → Publish to web → CSV → copy the URL</div>
+    </div>
+    <button class="btn-p" id="test-btn" onclick="testAndSave()">🔗 Test connection & generate JCA link</button>
+    <div class="pw" id="pw"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt" id="pt"></div></div>
+    <div class="ebox" id="ue"></div>
+    <div class="sbox" id="sb">
+      <div class="s-t">✅ Connection verified! JCA link is ready.</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Share this link with all JCAs — works from any device:</div>
+      <div class="s-url" id="jca-url"></div>
+      <div class="s-row">
+        <button class="sbtn sbtn-g" onclick="copyJCALink()">📋 Copy JCA link</button>
+        <button class="sbtn sbtn-d" onclick="openJCALink()">🔗 Open JCA page</button>
+      </div>
+      <div class="s-inf">
+        👤 JCA opens link → types PRM ID → sees their dashboard instantly.<br>
+        🔁 <strong>Daily update:</strong> Paste new data into the same Google Sheet (no need to change the JCA link).<br>
+        📱 Works on mobile, tablet, and desktop.
+      </div>
+    </div>
+  </div>
+</div>
 
 </div>
 <footer>Jio · JCA Performance Portal · Admin Panel · Internal use only</footer>
 
 <script>
-let rawData = [];
-let fileHeaders = [];
-let mappedData = [];
+let rawData=[], fileHeaders=[], mappedData=[], generatedLink='';
 
-const FIELDS = [
-  {key:'PRM_ID',   label:'PRM_ID',    required:true},
-  {key:'Name',     label:'Name',      required:true},
-  {key:'JC_Code',  label:'JC_Code',   required:false},
-  {key:'Lap',      label:'Lap',       required:true},
-  {key:'Lead_Type',label:'Lead_Type', required:true},
-  {key:'Allocated',label:'Allocated', required:true},
-  {key:'Converted',label:'Converted', required:true},
-  {key:'Eff_Call', label:'Eff_Call',  required:true},
-  {key:'Commission',label:'Commission',required:false},
+const FIELDS=[
+  {k:'PRM_ID',req:true},{k:'Name',req:true},{k:'JC_Code',req:false},
+  {k:'Lap',req:true},{k:'Lead_Type',req:true},{k:'Allocated',req:true},
+  {k:'Converted',req:true},{k:'Eff_Call',req:true},{k:'Commission',req:false}
 ];
-const NUM_FIELDS = ['Lap','Allocated','Converted','Eff_Call','Commission'];
-
-// Auto-match heuristics
-const MATCH = {
-  PRM_ID:    ['prm','prmid','prm_id','prm id','associate id','emp id','employee id','jca id','prm no','staff id'],
-  Name:      ['name','employee name','emp name','associate name','jca name','full name','agent name'],
-  JC_Code:   ['jc_code','jc code','jccode','jc','center code','jio center','center','branch'],
-  Lap:       ['lap','lap no','lap number','lap_no','cycle','period','batch'],
-  Lead_Type: ['lead_type','lead type','leadtype','type','lead','category','scheme'],
-  Allocated: ['allocated','alloc','leads allocated','total allocated','assigned','total leads','allotted'],
-  Converted: ['converted','conv','leads converted','activations','activation','total converted','success','done'],
-  Eff_Call:  ['eff_call','eff call','effcall','effective call','effective calls','eff calls','calls','valid calls','productive','eff. call'],
-  Commission:['commission','comm','earning','earnings','incentive','payout','amount','pay'],
+const NUMS=['Lap','Allocated','Converted','Eff_Call','Commission'];
+const HINTS={
+  PRM_ID:   ['prm','prmid','prm_id','prm id','prm no','associate id','emp id','employee id','jca id','staff id','agent id'],
+  Name:     ['name','employee name','emp name','associate name','jca name','full name','agent name'],
+  JC_Code:  ['jc_code','jc code','jccode','jc','center code','jio center','center','branch','jc name'],
+  Lap:      ['lap','lap no','lap number','lap_no','cycle','period','batch','phase'],
+  Lead_Type:['lead_type','lead type','leadtype','type','lead','category','scheme','program'],
+  Allocated:['allocated','alloc','leads allocated','total allocated','assigned','total leads','allotted','target'],
+  Converted:['converted','conv','leads converted','activations','activation','total converted','success','done','achieved'],
+  Eff_Call: ['eff_call','eff call','effcall','effective call','effective calls','eff calls','calls','valid calls','productive','eff. call','eff.call'],
+  Commission:['commission','comm','earning','earnings','incentive','payout','amount','pay','income']
 };
-
-function bestMatch(header) {
-  const h = header.toLowerCase().replace(/[\s\-_\.]+/g,'');
-  for (const [field, variants] of Object.entries(MATCH)) {
-    for (const v of variants) {
-      if (h === v.replace(/[\s\-_\.]+/g,'')) return field;
-    }
+function bestMatch(h){
+  const n=h.toLowerCase().replace(/[\s\-_\.]+/g,'');
+  for(const[f,vs] of Object.entries(HINTS)){
+    for(const v of vs){ if(n===v.replace(/[\s\-_\.]+/g,'')) return f; }
   }
   return '';
 }
+function esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-/* FILE UPLOAD */
-document.getElementById('file-input').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  document.getElementById('upload-label').textContent = '✅ ' + file.name;
-  document.getElementById('upload-zone').classList.add('has-file');
-  document.getElementById('parse-error').style.display = 'none';
-
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    try {
-      const wb = XLSX.read(ev.target.result, {type:'binary', cellDates:true});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      rawData = XLSX.utils.sheet_to_json(ws, {defval:''});
-      fileHeaders = rawData.length > 0 ? Object.keys(rawData[0]) : [];
-      if (!fileHeaders.length) { showErr('parse-error','File is empty or has no header row.'); return; }
-      renderRawPreview();
+/* ── FILE UPLOAD ── */
+document.getElementById('fi').addEventListener('change',function(e){
+  const file=e.target.files[0]; if(!file) return;
+  document.getElementById('ul').textContent='✅ '+file.name;
+  document.getElementById('uz').classList.add('has-file');
+  document.getElementById('pe').style.display='none';
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'binary',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      rawData=XLSX.utils.sheet_to_json(ws,{defval:''});
+      fileHeaders=rawData.length>0?Object.keys(rawData[0]):[];
+      if(!fileHeaders.length){showErr('pe','File appears empty or has no header row.');return;}
+      renderRaw();
       renderMapper();
-      document.getElementById('card2').classList.add('done');
-      document.getElementById('sn2').textContent = '✓';
-    } catch(err) {
-      showErr('parse-error','Cannot read file: ' + err.message);
-    }
+      done('c1','n1');
+      show('c2'); active('c2');
+    }catch(err){showErr('pe','Cannot read file: '+err.message);}
   };
-  reader.onerror = () => showErr('parse-error','File read failed. Try again.');
+  reader.onerror=()=>showErr('pe','File read failed.');
   reader.readAsBinaryString(file);
 });
 
-function renderRawPreview() {
-  document.getElementById('raw-preview').style.display = 'block';
-  document.getElementById('found-cols').innerHTML = fileHeaders.map(h=>`<span class="chip">${h}</span>`).join('');
-  const tbl = document.getElementById('raw-table');
-  tbl.innerHTML = '';
-  const th = document.createElement('thead');
-  th.innerHTML = '<tr>' + fileHeaders.map(h=>`<th>${h}</th>`).join('') + '</tr>';
+function renderRaw(){
+  document.getElementById('raw-wrap').style.display='block';
+  document.getElementById('col-chips').innerHTML=fileHeaders.map(h=>`<span class="chip">${esc(h)}</span>`).join('');
+  const tbl=document.getElementById('rt'); tbl.innerHTML='';
+  const th=document.createElement('thead');
+  th.innerHTML='<tr>'+fileHeaders.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr>';
   tbl.appendChild(th);
-  const tb = document.createElement('tbody');
-  rawData.slice(0,3).forEach(row => {
-    const tr = document.createElement('tr');
-    fileHeaders.forEach(h => { const td = document.createElement('td'); td.textContent = String(row[h]||'').substring(0,25); tr.appendChild(td); });
+  const tb=document.createElement('tbody');
+  rawData.slice(0,3).forEach(row=>{
+    const tr=document.createElement('tr');
+    fileHeaders.forEach(h=>{const td=document.createElement('td');td.textContent=String(row[h]||'').substring(0,25);tr.appendChild(td);});
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
 }
 
-function renderMapper() {
-  document.getElementById('card3').style.display = 'block';
-  document.getElementById('card3').classList.add('warn');
-  const grid = document.getElementById('mapper-grid');
-  grid.innerHTML = '';
-  const opts = '<option value="">— skip —</option>' + fileHeaders.map(h=>`<option value="${escH(h)}">${h}</option>`).join('');
-
-  FIELDS.forEach(f => {
-    const auto = fileHeaders.find(h => bestMatch(h) === f.key) || '';
-    // label
-    const lbl = document.createElement('div');
-    lbl.className = 'map-target';
-    lbl.innerHTML = `${f.key} <span style="font-size:10px;color:${f.required?'var(--red)':'var(--text3)'};font-weight:400">${f.required?'*req':'opt'}</span>`;
-    // arrow
-    const arr = document.createElement('div');
-    arr.className = 'map-arrow';
-    arr.textContent = '←';
-    // select
-    const sel = document.createElement('select');
-    sel.id = 'map_' + f.key;
-    sel.innerHTML = opts;
-    if (auto) sel.value = auto;
-    grid.appendChild(lbl);
-    grid.appendChild(arr);
-    grid.appendChild(sel);
+function renderMapper(){
+  const grid=document.getElementById('mg'); grid.innerHTML='';
+  const opts='<option value="">— skip —</option>'+fileHeaders.map(h=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');
+  FIELDS.forEach(f=>{
+    const auto=fileHeaders.find(h=>bestMatch(h)===f.k)||'';
+    const lbl=document.createElement('div'); lbl.className='mt';
+    lbl.innerHTML=`${f.k} <span style="font-size:10px;color:${f.req?'var(--red)':'var(--text3)'};font-weight:400">${f.req?'*req':'opt'}</span>`;
+    const arr=document.createElement('div'); arr.className='ma'; arr.textContent='←';
+    const sel=document.createElement('select'); sel.id='m_'+f.k; sel.innerHTML=opts;
+    if(auto) sel.value=auto;
+    grid.appendChild(lbl); grid.appendChild(arr); grid.appendChild(sel);
   });
 }
 
-function escH(s){ return s.replace(/"/g,'&quot;'); }
-
-function applyMapping() {
-  document.getElementById('map-error').style.display = 'none';
-  const mapping = {};
-  FIELDS.forEach(f => {
-    const el = document.getElementById('map_' + f.key);
-    mapping[f.key] = el ? el.value : '';
-  });
-  // Check required
-  const missing = FIELDS.filter(f => f.required && !mapping[f.key]).map(f => f.key);
-  if (missing.length) { showErr('map-error', 'Please map these required fields: ' + missing.join(', ')); return; }
-
-  mappedData = rawData.map(row => {
-    const out = {};
-    FIELDS.forEach(f => {
-      const src = mapping[f.key];
-      const val = src ? row[src] : '';
-      out[f.key] = NUM_FIELDS.includes(f.key) ? (isNaN(+val) ? 0 : +val) : String(val||'').trim();
+/* ── APPLY MAP ── */
+function applyMap(){
+  document.getElementById('me').style.display='none';
+  const map={};
+  FIELDS.forEach(f=>{const el=document.getElementById('m_'+f.k);map[f.k]=el?el.value:'';});
+  const miss=FIELDS.filter(f=>f.req&&!map[f.k]).map(f=>f.k);
+  if(miss.length){showErr('me','Map these required fields: '+miss.join(', '));return;}
+  mappedData=rawData.map(row=>{
+    const out={};
+    FIELDS.forEach(f=>{
+      const v=map[f.k]?row[map[f.k]]:'';
+      out[f.k]=NUMS.includes(f.k)?(isNaN(+v)?0:+v):String(v||'').trim();
     });
     return out;
-  }).filter(r => r.PRM_ID && r.PRM_ID !== '');
-
-  if (!mappedData.length) { showErr('map-error', 'No valid rows after mapping. Check PRM_ID column.'); return; }
-
-  renderMappedPreview();
-  document.getElementById('card3').classList.remove('warn');
-  document.getElementById('card3').classList.add('done');
-  document.getElementById('sn3').textContent = '✓';
-  document.getElementById('card4').style.display = 'block';
-  document.getElementById('card4').classList.add('active');
+  }).filter(r=>r.PRM_ID);
+  if(!mappedData.length){showErr('me','No valid rows. Check PRM_ID mapping.');return;}
+  renderMapped();
+  done('c2','n2');
+  show('c3'); active('c3');
 }
 
-function renderMappedPreview() {
-  document.getElementById('mapped-preview').style.display = 'block';
-  const prms = [...new Set(mappedData.map(r=>r.PRM_ID))];
-  const laps = [...new Set(mappedData.map(r=>r.Lap))];
-  const types = [...new Set(mappedData.map(r=>r.Lead_Type))].filter(Boolean);
-  document.getElementById('stats-row').innerHTML =
-    `<div class="stat-pill">👤 <strong>${prms.length}</strong> JCAs</div>
-     <div class="stat-pill">📋 <strong>${mappedData.length}</strong> rows</div>
-     <div class="stat-pill">🔄 <strong>${laps.length}</strong> Lap(s)</div>
-     <div class="stat-pill">🏷 <strong>${types.join(' · ')||'—'}</strong></div>`;
-  const cols = FIELDS.map(f=>f.key);
-  const tbl = document.getElementById('mapped-table');
-  tbl.innerHTML = '';
-  const th = document.createElement('thead');
-  th.innerHTML = '<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+function renderMapped(){
+  document.getElementById('mp').style.display='block';
+  const prms=[...new Set(mappedData.map(r=>r.PRM_ID))];
+  const laps=[...new Set(mappedData.map(r=>r.Lap))];
+  const types=[...new Set(mappedData.map(r=>r.Lead_Type))].filter(Boolean);
+  document.getElementById('sp').innerHTML=
+    `<div class="spill">👤 <strong>${prms.length}</strong> JCAs</div>
+     <div class="spill">📋 <strong>${mappedData.length}</strong> rows</div>
+     <div class="spill">🔄 <strong>${laps.length}</strong> Lap(s)</div>
+     <div class="spill">🏷 <strong>${types.join(' · ')||'—'}</strong></div>`;
+  const cols=FIELDS.map(f=>f.k);
+  const tbl=document.getElementById('mt'); tbl.innerHTML='';
+  const th=document.createElement('thead');
+  th.innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
   tbl.appendChild(th);
-  const tb = document.createElement('tbody');
-  mappedData.slice(0,5).forEach(row => {
-    const tr = document.createElement('tr');
-    cols.forEach(c => {
-      const td = document.createElement('td');
-      if (c==='Lead_Type') {
-        const lt=(row[c]||'').toUpperCase();
-        const cls=lt==='SC+'?'badge-sc':lt==='RR'?'badge-rr':'badge-ht';
-        td.innerHTML=`<span class="badge ${cls}">${row[c]||'-'}</span>`;
-      } else { td.textContent = row[c]!==undefined?row[c]:'-'; }
+  const tb=document.createElement('tbody');
+  mappedData.slice(0,5).forEach(row=>{
+    const tr=document.createElement('tr');
+    cols.forEach(c=>{
+      const td=document.createElement('td');
+      if(c==='Lead_Type'){const lt=(row[c]||'').toUpperCase();const cl=lt==='SC+'?'b-sc':lt==='RR'?'b-rr':'b-ht';td.innerHTML=`<span class="badge ${cl}">${row[c]||'-'}</span>`;}
+      else td.textContent=row[c]!==undefined?row[c]:'-';
       tr.appendChild(td);
     });
     tb.appendChild(tr);
@@ -387,124 +397,106 @@ function renderMappedPreview() {
   tbl.appendChild(tb);
 }
 
-/* JSONBIN UPLOAD */
-async function uploadToJSONBin() {
-  const masterKey = document.getElementById('master-key').value.trim();
-  const binId = document.getElementById('bin-id').value.trim();
-  if (!masterKey) { showErr('upload-error','Enter your JSONBin Master Key in Step 1.'); return; }
-  if (!mappedData.length) { showErr('upload-error','No mapped data. Complete Step 3 first.'); return; }
+/* ── COPY DATA ── */
+function copyMappedData(){
+  const cols=FIELDS.map(f=>f.k);
+  const lines=[cols.join('\t')];
+  mappedData.forEach(row=>lines.push(cols.map(c=>row[c]!==undefined?row[c]:'').join('\t')));
+  const text=lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.textContent='✅ Copied! Now paste in Google Sheets (Ctrl+V)';
+    b.style.background='var(--green)';
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);
+    const b=document.getElementById('copy-btn');
+    b.textContent='✅ Copied!';
+  });
+}
 
-  const btn = document.getElementById('upload-btn');
-  btn.disabled = true;
-  document.getElementById('success-box').style.display = 'none';
-  document.getElementById('upload-error').style.display = 'none';
+function nextStep3(){
+  done('c3','n3');
+  show('c4'); active('c4');
+}
 
-  const pw = document.getElementById('progress-wrap');
-  const pf = document.getElementById('progress-fill');
-  const pt = document.getElementById('progress-text');
-  pw.style.display = 'block';
-  pf.style.width = '20%';
-  pt.textContent = 'Connecting to JSONBin…';
+/* ── TEST GOOGLE SHEET ── */
+async function testAndSave(){
+  const url=document.getElementById('sheet-url').value.trim();
+  document.getElementById('ue').style.display='none';
+  document.getElementById('sb').style.display='none';
+  if(!url){showErr('ue','Please paste the Google Sheets CSV URL.');return;}
+  if(!url.includes('docs.google.com')){showErr('ue','URL must be a Google Sheets link. Example: https://docs.google.com/spreadsheets/d/.../pub?output=csv');return;}
 
-  const payload = { updated: new Date().toISOString(), records: mappedData };
+  const btn=document.getElementById('test-btn'); btn.disabled=true;
+  const pw=document.getElementById('pw'),pf=document.getElementById('pf'),pt=document.getElementById('pt');
+  pw.style.display='block'; pf.style.width='30%'; pt.textContent='Testing connection…';
 
-  try {
-    pf.style.width = '50%';
-    pt.textContent = 'Uploading ' + mappedData.length + ' rows…';
+  // Build proxy URL to avoid CORS
+  const proxyUrl='https://corsproxy.io/?'+encodeURIComponent(url);
 
-    // Build request
-    const headers = { 'Content-Type':'application/json', 'X-Master-Key': masterKey };
-    let url, method;
+  try{
+    pf.style.width='60%'; pt.textContent='Fetching sheet data…';
+    const res=await fetch(proxyUrl);
+    if(!res.ok) throw new Error('Cannot reach Google Sheet (HTTP '+res.status+'). Make sure it is published.');
+    const text=await res.text();
+    const lines=text.split('\n').filter(l=>l.trim());
+    if(lines.length<2) throw new Error('Sheet appears empty. Make sure data was pasted correctly.');
+    const headers=parseCSVLine(lines[0]);
+    if(!headers.includes('PRM_ID')) throw new Error('Column PRM_ID not found in sheet. Make sure you pasted the mapped data correctly.');
+    pf.style.width='100%'; pt.textContent='✅ Connected! '+( lines.length-1)+' rows found.';
 
-    if (binId) {
-      url = 'https://api.jsonbin.io/v3/b/' + binId;
-      method = 'PUT';
-    } else {
-      url = 'https://api.jsonbin.io/v3/b';
-      method = 'POST';
-      headers['X-Bin-Name'] = 'jca-portal-data';
-      headers['X-Bin-Private'] = 'false'; // public so JCAs can read without key
-    }
+    // Save sheet URL to localStorage for JCA page
+    localStorage.setItem('jca_sheet_url', url);
 
-    const res = await fetch(url, { method, headers, body: JSON.stringify(payload) });
-    pf.style.width = '85%';
-
-    if (!res.ok) {
-      let msg = 'HTTP ' + res.status;
-      try { const d = await res.json(); msg = d.message || msg; } catch(e){}
-      if (res.status===401) msg = 'Invalid Master Key — please check it at jsonbin.io → API Keys.';
-      if (res.status===404) msg = 'Bin ID not found. Leave it blank to create a new bin.';
-      if (res.status===429) msg = 'Too many requests — wait 1 minute and try again.';
-      if (res.status===400) msg = 'Bad request — data may be too large. Try reducing the number of rows.';
-      throw new Error(msg);
-    }
-
-    const data = await res.json();
-    const newBinId = (data.metadata && data.metadata.id) ? data.metadata.id : binId;
-    pf.style.width = '100%';
-    pt.textContent = '✅ Upload complete!';
-
-    document.getElementById('bin-id').value = newBinId;
-    document.getElementById('bin-id-display').textContent = newBinId;
-    ['card1','card4'].forEach(id => {
-      document.getElementById(id).classList.remove('active');
-      document.getElementById(id).classList.add('done');
-    });
-    document.getElementById('sn4').textContent = '✓';
-    document.getElementById('sn1').textContent = '✓';
-
-    // JCA link
-    const base = window.location.href.replace(/[?#].*$/,'').replace(/admin\.html$/,'index.html');
-    const link = base + '?bin=' + newBinId;
-    document.getElementById('jca-url').textContent = link;
-    document.getElementById('success-box').style.display = 'block';
-    setTimeout(() => { pw.style.display = 'none'; }, 1500);
-
-  } catch(err) {
-    pw.style.display = 'none';
-    btn.disabled = false;
-    let msg = err.message || String(err);
-    if (/failed to fetch|networkerror|cors|load failed/i.test(msg)) {
-      msg = '❌ Network / CORS error. Most likely cause: wrong Master Key. Please verify at jsonbin.io → API Keys and try again.';
-    }
-    showErr('upload-error', msg);
+    // Build JCA link
+    const base=window.location.href.replace(/[?#].*$/).replace(/admin\.html$/,'index.html');
+    const encoded=encodeURIComponent(url);
+    generatedLink=base+'?sheet='+encoded;
+    document.getElementById('jca-url').textContent=generatedLink;
+    document.getElementById('sb').style.display='block';
+    done('c4','n4');
+    setTimeout(()=>{pw.style.display='none';},1500);
+  }catch(err){
+    pw.style.display='none'; btn.disabled=false;
+    let msg=err.message;
+    if(/failed to fetch|networkerror|cors/i.test(msg)) msg='Cannot reach the sheet. Make sure you have published it via File → Share → Publish to web → CSV.';
+    showErr('ue',msg);
   }
 }
 
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  el.innerHTML = '⚠ ' + msg;
-  el.style.display = 'block';
+function parseCSVLine(line){
+  const result=[]; let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    if(line[i]==='"'){inQ=!inQ;}
+    else if(line[i]===','&&!inQ){result.push(cur.trim());cur='';}
+    else cur+=line[i];
+  }
+  result.push(cur.trim());
+  return result;
 }
 
-function copyURL() {
-  const url = document.getElementById('jca-url').textContent;
-  navigator.clipboard.writeText(url).then(() => {
-    const b = document.querySelectorAll('.s-btn')[0];
-    b.textContent = '✅ Copied!';
-    setTimeout(() => b.textContent = '📋 Copy JCA link', 2000);
-  }).catch(() => fallbackCopy(url));
+function copyJCALink(){
+  navigator.clipboard.writeText(generatedLink).then(()=>{
+    const b=document.querySelectorAll('.sbtn')[0];
+    b.textContent='✅ Copied!';
+    setTimeout(()=>b.textContent='📋 Copy JCA link',2000);
+  }).catch(()=>fallbackCopy(generatedLink));
 }
+function openJCALink(){ window.open(generatedLink,'_blank'); }
+function fallbackCopy(t){const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);}
 
-function copyBinId() {
-  const bid = document.getElementById('bin-id-display').textContent;
-  navigator.clipboard.writeText(bid).then(() => {
-    const b = document.querySelectorAll('.s-btn')[1];
-    b.textContent = '✅ Copied!';
-    setTimeout(() => b.textContent = 'Copy Bin ID', 2000);
-  }).catch(() => fallbackCopy(bid));
+/* ── HELPERS ── */
+function showErr(id,msg){const el=document.getElementById(id);el.innerHTML='⚠ '+msg;el.style.display='block';}
+function show(id){document.getElementById(id).style.display='block';}
+function active(id){document.getElementById(id).classList.add('active');}
+function done(cid,nid){
+  const c=document.getElementById(cid);
+  c.classList.remove('active','warn');c.classList.add('done');
+  document.getElementById(nid).textContent='✓';
 }
-
-function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-  document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-  document.body.removeChild(ta);
-}
-
-document.getElementById('master-key').addEventListener('input', function() {
-  if (this.value.length > 10) document.getElementById('card2').classList.add('active');
-});
 </script>
 </body>
 </html>
