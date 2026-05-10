@@ -10,56 +10,44 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;
-  --surface:#161b22;
-  --surface2:#21262d;
-  --surface3:#30363d;
-  --border:#30363d;
-  --border2:#484f58;
-  --text1:#e6edf3;
-  --text2:#8b949e;
-  --text3:#484f58;
-  --blue:#2f81f7;
-  --blue-dim:rgba(47,129,247,0.15);
-  --green:#3fb950;
-  --green-dim:rgba(63,185,80,0.15);
-  --orange:#d29922;
-  --orange-dim:rgba(210,153,34,0.15);
-  --red:#f85149;
-  --red-dim:rgba(248,81,73,0.15);
-  --radius:8px;
-  --radius-lg:12px;
-  --font:'DM Sans',sans-serif;
-  --mono:'DM Mono',monospace;
+  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--surface3:#30363d;
+  --border:#30363d;--border2:#484f58;
+  --text1:#e6edf3;--text2:#8b949e;--text3:#484f58;
+  --blue:#2f81f7;--blue-dim:rgba(47,129,247,0.15);
+  --green:#3fb950;--green-dim:rgba(63,185,80,0.15);
+  --orange:#d29922;--orange-dim:rgba(210,153,34,0.15);
+  --red:#f85149;--red-dim:rgba(248,81,73,0.15);
+  --yellow:#e3b341;--yellow-dim:rgba(227,179,65,0.15);
+  --radius:8px;--radius-lg:12px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text1);min-height:100vh;display:flex;flex-direction:column}
-/* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;gap:16px}
-.logo-badge{background:var(--blue);color:#fff;font-weight:700;font-size:13px;padding:4px 12px;border-radius:6px;letter-spacing:0.5px}
-.header-title{font-size:15px;font-weight:600;color:var(--text1)}
-.header-sub{font-size:12px;color:var(--text3);margin-left:8px;padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
-/* MAIN */
-.main{flex:1;max-width:680px;margin:0 auto;padding:40px 16px 60px;width:100%}
-/* STEP CARD */
+.logo-badge{background:var(--blue);color:#fff;font-weight:700;font-size:13px;padding:4px 12px;border-radius:6px;letter-spacing:.5px}
+.header-title{font-size:15px;font-weight:600}
+.header-sub{font-size:12px;color:var(--text3);padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
+.main{flex:1;max-width:700px;margin:0 auto;padding:40px 16px 60px;width:100%}
 .step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;transition:border-color .2s}
 .step-card.active{border-color:var(--blue)}
 .step-card.done{border-color:var(--green)}
-.step-head{padding:20px 24px;display:flex;align-items:center;gap:14px}
-.step-num{width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);flex-shrink:0;transition:background .2s,border-color .2s,color .2s}
+.step-card.warn{border-color:var(--yellow)}
+.step-head{padding:18px 24px;display:flex;align-items:center;gap:14px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text2);flex-shrink:0;transition:all .2s}
 .step-card.active .step-num{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
 .step-card.done .step-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
-.step-info h3{font-size:14px;font-weight:600;color:var(--text1)}
+.step-card.warn .step-num{background:var(--yellow-dim);border-color:var(--yellow);color:var(--yellow)}
+.step-info h3{font-size:14px;font-weight:600}
 .step-info p{font-size:12px;color:var(--text2);margin-top:2px}
 .step-body{padding:0 24px 24px;border-top:1px solid var(--border)}
-/* INPUTS */
-.field-group{margin-bottom:16px;margin-top:16px}
-.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
-input[type=text],input[type=password]{width:100%;height:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:14px;font-family:var(--mono);color:var(--text1);outline:none;transition:border-color .15s}
-input[type=text]:focus,input[type=password]:focus{border-color:var(--blue)}
-.hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+.field-group{margin-top:16px}
+.field-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:block}
+input[type=text],input[type=password],select{width:100%;height:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:13px;font-family:var(--mono);color:var(--text1);outline:none;transition:border-color .15s;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--blue)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+select option{background:#21262d}
+.hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5}
 .hint a{color:var(--blue);text-decoration:none}
 .hint a:hover{text-decoration:underline}
-/* UPLOAD ZONE */
 .upload-zone{position:relative;border:2px dashed var(--border2);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:16px}
 .upload-zone:hover{border-color:var(--blue);background:var(--blue-dim)}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -68,46 +56,42 @@ input[type=text]:focus,input[type=password]:focus{border-color:var(--blue)}
 .upload-zone .uz-hint{font-size:11px;color:var(--text3);margin-top:4px}
 .upload-zone.has-file{border-color:var(--green);background:var(--green-dim)}
 .upload-zone.has-file .uz-text{color:var(--green)}
-/* PREVIEW TABLE */
-.preview-wrap{margin-top:16px;display:none}
-.preview-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+.raw-preview{margin-top:16px;display:none}
+.section-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
 .table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
-th{background:var(--surface2);padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);font-family:var(--mono);font-size:11px}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
+th{background:var(--surface2);padding:8px 12px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text1);font-family:var(--mono);font-size:11px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
 tr:last-child td{border-bottom:none}
 .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
 .badge-sc{background:var(--blue-dim);color:var(--blue)}
 .badge-rr{background:var(--green-dim);color:var(--green)}
 .badge-ht{background:var(--orange-dim);color:var(--orange)}
-/* STATS ROW */
-.stats-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
-.stat-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.stat-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px}
 .stat-pill strong{color:var(--text1);font-weight:700}
-/* BTN */
-.btn-upload{width:100%;height:44px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;margin-top:20px;letter-spacing:0.3px}
-.btn-upload:hover{opacity:.88}
-.btn-upload:disabled{opacity:.4;cursor:not-allowed}
-/* PROGRESS */
-.progress-wrap{margin-top:20px;display:none}
+.mapper-grid{display:grid;grid-template-columns:1fr 26px 1fr;gap:8px 8px;align-items:center}
+.map-target{font-size:12px;font-weight:600;font-family:var(--mono);background:var(--surface3);border-radius:5px;padding:7px 10px;color:var(--text1)}
+.map-arrow{text-align:center;color:var(--text3);font-size:15px}
+.btn-primary{height:44px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;letter-spacing:.3px;width:100%;margin-top:16px}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.progress-wrap{margin-top:16px;display:none}
 .progress-bar{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s;width:0%}
-.progress-text{font-size:12px;color:var(--text2);margin-top:8px}
-/* SUCCESS BOX */
-.success-box{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius);padding:16px 20px;margin-top:20px;display:none}
-.success-box .s-title{font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px}
-.success-box .s-url{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;word-break:break-all;margin-bottom:10px;cursor:pointer;transition:background .15s}
-.success-box .s-url:hover{background:var(--surface3)}
-.success-box .s-copy-btn{height:32px;padding:0 16px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
-.success-box .s-info{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.6}
-/* ERROR */
-.error-box{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius);padding:12px 16px;margin-top:12px;font-size:12px;color:var(--red);display:none}
-/* FORMAT CARD */
-.format-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:16px}
-.format-card p{font-size:12px;color:var(--text2);margin-bottom:10px}
-.format-card code{font-family:var(--mono);font-size:11px;color:var(--text1);display:block;line-height:2;overflow-x:auto;white-space:pre}
-.col-tag{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-size:10px;margin-right:4px;margin-bottom:4px;color:var(--text1)}
-/* FOOTER */
+.progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;width:0%}
+.progress-text{font-size:12px;color:var(--text2);margin-top:7px}
+.success-box{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius);padding:18px 20px;margin-top:16px;display:none}
+.s-title{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px}
+.s-url{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;word-break:break-all;margin-bottom:10px;line-height:1.5}
+.s-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.s-btn{height:34px;padding:0 16px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.s-btn-green{background:var(--green);color:#fff}
+.s-btn-grey{background:var(--surface3);color:var(--text1)}
+.s-info{font-size:11px;color:var(--text2);line-height:1.7;margin-top:10px}
+.bin-val{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;display:inline-block;margin-top:4px;word-break:break-all}
+.error-box{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius);padding:11px 15px;margin-top:12px;font-size:12px;color:var(--red);display:none;line-height:1.6}
+.info-box{background:var(--blue-dim);border:1px solid rgba(47,129,247,.35);border-radius:var(--radius);padding:12px 15px;margin-top:14px;font-size:12px;color:var(--text2);line-height:1.7}
+.chip{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:3px 9px;font-size:11px;font-family:var(--mono);color:var(--text1);margin:2px}
 footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-top:1px solid var(--border)}
 </style>
 </head>
@@ -121,305 +105,405 @@ footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-t
 
 <div class="main">
 
-  <!-- STEP 1: JSONBin Config -->
+  <!-- STEP 1 -->
   <div class="step-card active" id="card1">
     <div class="step-head">
       <div class="step-num" id="sn1">1</div>
-      <div class="step-info">
-        <h3>Configure JSONBin</h3>
-        <p>One-time setup — enter your JSONBin credentials</p>
-      </div>
+      <div class="step-info"><h3>JSONBin Setup</h3><p>One-time credentials — never stored anywhere</p></div>
     </div>
     <div class="step-body">
-      <div class="field-group">
-        <div class="field-label">JSONBin Master Key</div>
-        <input type="password" id="master-key" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxx">
-        <div class="hint">Get your free key at <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → Sign up → API Keys → Master Key</div>
+      <div class="info-box">
+        <strong>How to get your free JSONBin Master Key:</strong><br>
+        1. Visit <a href="https://jsonbin.io" target="_blank" style="color:var(--blue)">jsonbin.io</a> → Sign up free (takes 30 seconds)<br>
+        2. After login → click <strong>API Keys</strong> in sidebar → copy <strong>Master Key</strong><br>
+        3. Paste below. Leave Bin ID blank on first upload — it will be auto-created.
       </div>
       <div class="field-group">
-        <div class="field-label">Bin ID <span style="color:var(--text3);font-weight:400;text-transform:none">(leave blank to auto-create on first upload)</span></div>
-        <input type="text" id="bin-id" placeholder="e.g. 665abc1234def5678" style="font-family:var(--mono)">
-        <div class="hint">After first upload, the Bin ID will be shown — save it for future uploads to the same bin.</div>
+        <label class="field-label">Master Key</label>
+        <input type="password" id="master-key" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Bin ID <span style="color:var(--text3);font-weight:400;text-transform:none;font-size:11px">(blank on first upload — paste saved ID on future uploads)</span></label>
+        <input type="text" id="bin-id" placeholder="e.g. 665abc1234def5678" spellcheck="false">
       </div>
     </div>
   </div>
 
-  <!-- STEP 2: Upload Excel -->
+  <!-- STEP 2 -->
   <div class="step-card" id="card2">
     <div class="step-head">
       <div class="step-num" id="sn2">2</div>
-      <div class="step-info">
-        <h3>Upload today's Excel file</h3>
-        <p>JCA performance data for all PRM IDs</p>
-      </div>
+      <div class="step-info"><h3>Upload Excel / CSV</h3><p>Any column names are fine — you'll map them in Step 3</p></div>
     </div>
     <div class="step-body">
-      <div class="format-card">
-        <p>📋 Required columns in your Excel / CSV:</p>
-        <div>
-          <span class="col-tag">PRM_ID</span>
-          <span class="col-tag">Name</span>
-          <span class="col-tag">JC_Code</span>
-          <span class="col-tag">Lap</span>
-          <span class="col-tag">Lead_Type</span>
-          <span class="col-tag">Allocated</span>
-          <span class="col-tag">Converted</span>
-          <span class="col-tag">Eff_Call</span>
-          <span class="col-tag">Commission</span>
-        </div>
-        <code style="margin-top:10px">Lead_Type values: SC+ | RR | HT WB</code>
-      </div>
-
       <div class="upload-zone" id="upload-zone">
         <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
         <div class="uz-icon">📂</div>
         <div class="uz-text" id="upload-label">Click to select Excel / CSV file</div>
-        <div class="uz-hint">.xlsx · .xls · .csv supported</div>
+        <div class="uz-hint">.xlsx · .xls · .csv accepted</div>
       </div>
-
-      <div class="preview-wrap" id="preview-wrap">
-        <div class="stats-row" id="stats-row"></div>
-        <div class="preview-label" style="margin-top:16px">Preview (first 5 rows)</div>
-        <div class="table-scroll"><table id="preview-table"></table></div>
-      </div>
-
       <div class="error-box" id="parse-error"></div>
+      <div class="raw-preview" id="raw-preview">
+        <div class="section-label" style="margin-top:16px">Columns found in your file</div>
+        <div id="found-cols"></div>
+        <div class="section-label" style="margin-top:14px">File preview (first 3 rows)</div>
+        <div class="table-scroll"><table id="raw-table"></table></div>
+      </div>
+    </div>
+  </div>
 
-      <button class="btn-upload" id="upload-btn" disabled onclick="uploadToJSONBin()">
-        ⬆ Push to JSONBin
-      </button>
+  <!-- STEP 3 -->
+  <div class="step-card" id="card3" style="display:none">
+    <div class="step-head">
+      <div class="step-num" id="sn3">3</div>
+      <div class="step-info"><h3>Map columns</h3><p>Tell the portal which column means what</p></div>
+    </div>
+    <div class="step-body">
+      <div style="font-size:12px;color:var(--text2);margin-top:14px;margin-bottom:14px">
+        Auto-matched where possible. Fix any wrong ones, then click Apply.
+      </div>
+      <div class="mapper-grid" id="mapper-grid"></div>
+      <button class="btn-primary" onclick="applyMapping()">✅ Apply mapping & preview →</button>
+      <div class="error-box" id="map-error"></div>
+      <div id="mapped-preview" style="display:none">
+        <div class="stats-row" id="stats-row" style="margin-top:16px"></div>
+        <div class="section-label">Mapped preview (first 5 rows)</div>
+        <div class="table-scroll"><table id="mapped-table"></table></div>
+      </div>
+    </div>
+  </div>
 
+  <!-- STEP 4 -->
+  <div class="step-card" id="card4" style="display:none">
+    <div class="step-head">
+      <div class="step-num" id="sn4">4</div>
+      <div class="step-info"><h3>Push to cloud</h3><p>Upload to JSONBin — JCAs access via shared link</p></div>
+    </div>
+    <div class="step-body">
+      <button class="btn-primary" id="upload-btn" onclick="uploadToJSONBin()">⬆ Push to JSONBin</button>
       <div class="progress-wrap" id="progress-wrap">
         <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="progress-text" id="progress-text">Uploading…</div>
+        <div class="progress-text" id="progress-text">Connecting…</div>
       </div>
-
-      <div class="success-box" id="success-box">
-        <div class="s-title">✅ Data uploaded successfully</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Share this link with your JCAs:</div>
-        <div class="s-url" id="jca-url" onclick="copyURL()"></div>
-        <button class="s-copy-btn" onclick="copyURL()">Copy link</button>
-        <div style="margin-top:10px;font-size:12px;color:var(--text2)">Bin ID (save for future uploads):</div>
-        <div style="font-family:var(--mono);font-size:12px;color:var(--text1);margin-top:4px" id="bin-id-display"></div>
-        <div class="s-info">JCAs open the link → enter their PRM ID → view their own dashboard. Data updates instantly when you re-upload.</div>
-      </div>
-
       <div class="error-box" id="upload-error"></div>
+      <div class="success-box" id="success-box">
+        <div class="s-title">✅ Data pushed successfully!</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:7px">Share this link with all JCAs:</div>
+        <div class="s-url" id="jca-url"></div>
+        <div class="s-row">
+          <button class="s-btn s-btn-green" onclick="copyURL()">📋 Copy JCA link</button>
+          <button class="s-btn s-btn-grey" onclick="copyBinId()">Copy Bin ID</button>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">Bin ID — save this for future daily uploads:</div>
+        <div class="bin-val" id="bin-id-display"></div>
+        <div class="s-info">
+          👤 JCAs open the link → type their PRM ID → see their dashboard instantly.<br>
+          🔁 Next upload: paste saved Bin ID in Step 1 so same link always works for JCAs.
+        </div>
+      </div>
     </div>
   </div>
 
 </div>
-
 <footer>Jio · JCA Performance Portal · Admin Panel · Internal use only</footer>
 
 <script>
-let parsedData = [];
+let rawData = [];
+let fileHeaders = [];
+let mappedData = [];
 
-/* ---- FILE PARSE ---- */
+const FIELDS = [
+  {key:'PRM_ID',   label:'PRM_ID',    required:true},
+  {key:'Name',     label:'Name',      required:true},
+  {key:'JC_Code',  label:'JC_Code',   required:false},
+  {key:'Lap',      label:'Lap',       required:true},
+  {key:'Lead_Type',label:'Lead_Type', required:true},
+  {key:'Allocated',label:'Allocated', required:true},
+  {key:'Converted',label:'Converted', required:true},
+  {key:'Eff_Call', label:'Eff_Call',  required:true},
+  {key:'Commission',label:'Commission',required:false},
+];
+const NUM_FIELDS = ['Lap','Allocated','Converted','Eff_Call','Commission'];
+
+// Auto-match heuristics
+const MATCH = {
+  PRM_ID:    ['prm','prmid','prm_id','prm id','associate id','emp id','employee id','jca id','prm no','staff id'],
+  Name:      ['name','employee name','emp name','associate name','jca name','full name','agent name'],
+  JC_Code:   ['jc_code','jc code','jccode','jc','center code','jio center','center','branch'],
+  Lap:       ['lap','lap no','lap number','lap_no','cycle','period','batch'],
+  Lead_Type: ['lead_type','lead type','leadtype','type','lead','category','scheme'],
+  Allocated: ['allocated','alloc','leads allocated','total allocated','assigned','total leads','allotted'],
+  Converted: ['converted','conv','leads converted','activations','activation','total converted','success','done'],
+  Eff_Call:  ['eff_call','eff call','effcall','effective call','effective calls','eff calls','calls','valid calls','productive','eff. call'],
+  Commission:['commission','comm','earning','earnings','incentive','payout','amount','pay'],
+};
+
+function bestMatch(header) {
+  const h = header.toLowerCase().replace(/[\s\-_\.]+/g,'');
+  for (const [field, variants] of Object.entries(MATCH)) {
+    for (const v of variants) {
+      if (h === v.replace(/[\s\-_\.]+/g,'')) return field;
+    }
+  }
+  return '';
+}
+
+/* FILE UPLOAD */
 document.getElementById('file-input').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
   document.getElementById('upload-label').textContent = '✅ ' + file.name;
   document.getElementById('upload-zone').classList.add('has-file');
   document.getElementById('parse-error').style.display = 'none';
+
   const reader = new FileReader();
   reader.onload = function(ev) {
     try {
-      const wb = XLSX.read(ev.target.result, { type: 'binary' });
+      const wb = XLSX.read(ev.target.result, {type:'binary', cellDates:true});
       const ws = wb.Sheets[wb.SheetNames[0]];
-      parsedData = XLSX.utils.sheet_to_json(ws);
-      parsedData = normalizeKeys(parsedData);
-      showPreview();
-      document.getElementById('card2').classList.add('active');
-      document.getElementById('upload-btn').disabled = false;
+      rawData = XLSX.utils.sheet_to_json(ws, {defval:''});
+      fileHeaders = rawData.length > 0 ? Object.keys(rawData[0]) : [];
+      if (!fileHeaders.length) { showErr('parse-error','File is empty or has no header row.'); return; }
+      renderRawPreview();
+      renderMapper();
+      document.getElementById('card2').classList.add('done');
+      document.getElementById('sn2').textContent = '✓';
     } catch(err) {
-      showParseError('Could not read file: ' + err.message);
+      showErr('parse-error','Cannot read file: ' + err.message);
     }
   };
-  reader.onerror = () => showParseError('Failed to read file.');
+  reader.onerror = () => showErr('parse-error','File read failed. Try again.');
   reader.readAsBinaryString(file);
 });
 
-function normalizeKeys(data) {
-  const map = {
-    prm_id:'PRM_ID', prmid:'PRM_ID',
-    name:'Name',
-    jc_code:'JC_Code', jccode:'JC_Code',
-    lap:'Lap',
-    lead_type:'Lead_Type', leadtype:'Lead_Type',
-    allocated:'Allocated',
-    converted:'Converted',
-    eff_call:'Eff_Call', effcall:'Eff_Call',
-    effective_call:'Eff_Call', effectivecall:'Eff_Call',
-    commission:'Commission'
-  };
-  return data.map(row => {
-    const out = {};
-    Object.keys(row).forEach(k => {
-      const nk = map[k.toLowerCase().replace(/[\s\-]+/g,'_')] ||
-                 map[k.toLowerCase().replace(/[\s\-_]+/g,'')] || k;
-      out[nk] = row[k];
-    });
-    return out;
+function renderRawPreview() {
+  document.getElementById('raw-preview').style.display = 'block';
+  document.getElementById('found-cols').innerHTML = fileHeaders.map(h=>`<span class="chip">${h}</span>`).join('');
+  const tbl = document.getElementById('raw-table');
+  tbl.innerHTML = '';
+  const th = document.createElement('thead');
+  th.innerHTML = '<tr>' + fileHeaders.map(h=>`<th>${h}</th>`).join('') + '</tr>';
+  tbl.appendChild(th);
+  const tb = document.createElement('tbody');
+  rawData.slice(0,3).forEach(row => {
+    const tr = document.createElement('tr');
+    fileHeaders.forEach(h => { const td = document.createElement('td'); td.textContent = String(row[h]||'').substring(0,25); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+}
+
+function renderMapper() {
+  document.getElementById('card3').style.display = 'block';
+  document.getElementById('card3').classList.add('warn');
+  const grid = document.getElementById('mapper-grid');
+  grid.innerHTML = '';
+  const opts = '<option value="">— skip —</option>' + fileHeaders.map(h=>`<option value="${escH(h)}">${h}</option>`).join('');
+
+  FIELDS.forEach(f => {
+    const auto = fileHeaders.find(h => bestMatch(h) === f.key) || '';
+    // label
+    const lbl = document.createElement('div');
+    lbl.className = 'map-target';
+    lbl.innerHTML = `${f.key} <span style="font-size:10px;color:${f.required?'var(--red)':'var(--text3)'};font-weight:400">${f.required?'*req':'opt'}</span>`;
+    // arrow
+    const arr = document.createElement('div');
+    arr.className = 'map-arrow';
+    arr.textContent = '←';
+    // select
+    const sel = document.createElement('select');
+    sel.id = 'map_' + f.key;
+    sel.innerHTML = opts;
+    if (auto) sel.value = auto;
+    grid.appendChild(lbl);
+    grid.appendChild(arr);
+    grid.appendChild(sel);
   });
 }
 
-function showPreview() {
-  const pw = document.getElementById('preview-wrap');
-  pw.style.display = 'block';
-  // Stats
-  const prms = [...new Set(parsedData.map(r => r.PRM_ID))];
-  const laps = [...new Set(parsedData.map(r => r.Lap))];
-  const types = [...new Set(parsedData.map(r => r.Lead_Type))];
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat-pill">👤 <strong>${prms.length}</strong> JCAs</div>
-    <div class="stat-pill">📋 <strong>${parsedData.length}</strong> rows</div>
-    <div class="stat-pill">🔄 <strong>${laps.length}</strong> Laps</div>
-    <div class="stat-pill">🏷 <strong>${types.join(', ')}</strong></div>
-  `;
-  // Table preview
-  const cols = ['PRM_ID','Name','JC_Code','Lap','Lead_Type','Allocated','Converted','Eff_Call','Commission'];
-  const tbl = document.getElementById('preview-table');
+function escH(s){ return s.replace(/"/g,'&quot;'); }
+
+function applyMapping() {
+  document.getElementById('map-error').style.display = 'none';
+  const mapping = {};
+  FIELDS.forEach(f => {
+    const el = document.getElementById('map_' + f.key);
+    mapping[f.key] = el ? el.value : '';
+  });
+  // Check required
+  const missing = FIELDS.filter(f => f.required && !mapping[f.key]).map(f => f.key);
+  if (missing.length) { showErr('map-error', 'Please map these required fields: ' + missing.join(', ')); return; }
+
+  mappedData = rawData.map(row => {
+    const out = {};
+    FIELDS.forEach(f => {
+      const src = mapping[f.key];
+      const val = src ? row[src] : '';
+      out[f.key] = NUM_FIELDS.includes(f.key) ? (isNaN(+val) ? 0 : +val) : String(val||'').trim();
+    });
+    return out;
+  }).filter(r => r.PRM_ID && r.PRM_ID !== '');
+
+  if (!mappedData.length) { showErr('map-error', 'No valid rows after mapping. Check PRM_ID column.'); return; }
+
+  renderMappedPreview();
+  document.getElementById('card3').classList.remove('warn');
+  document.getElementById('card3').classList.add('done');
+  document.getElementById('sn3').textContent = '✓';
+  document.getElementById('card4').style.display = 'block';
+  document.getElementById('card4').classList.add('active');
+}
+
+function renderMappedPreview() {
+  document.getElementById('mapped-preview').style.display = 'block';
+  const prms = [...new Set(mappedData.map(r=>r.PRM_ID))];
+  const laps = [...new Set(mappedData.map(r=>r.Lap))];
+  const types = [...new Set(mappedData.map(r=>r.Lead_Type))].filter(Boolean);
+  document.getElementById('stats-row').innerHTML =
+    `<div class="stat-pill">👤 <strong>${prms.length}</strong> JCAs</div>
+     <div class="stat-pill">📋 <strong>${mappedData.length}</strong> rows</div>
+     <div class="stat-pill">🔄 <strong>${laps.length}</strong> Lap(s)</div>
+     <div class="stat-pill">🏷 <strong>${types.join(' · ')||'—'}</strong></div>`;
+  const cols = FIELDS.map(f=>f.key);
+  const tbl = document.getElementById('mapped-table');
   tbl.innerHTML = '';
-  const thead = document.createElement('thead');
-  thead.innerHTML = '<tr>' + cols.map(c=>`<th>${c}</th>`).join('') + '</tr>';
-  tbl.appendChild(thead);
-  const tbody = document.createElement('tbody');
-  parsedData.slice(0,5).forEach(row => {
+  const th = document.createElement('thead');
+  th.innerHTML = '<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  tbl.appendChild(th);
+  const tb = document.createElement('tbody');
+  mappedData.slice(0,5).forEach(row => {
     const tr = document.createElement('tr');
     cols.forEach(c => {
       const td = document.createElement('td');
-      if (c === 'Lead_Type') {
-        const lt = (row[c]||'').toUpperCase();
-        const cls = lt==='SC+' ? 'badge-sc' : lt==='RR' ? 'badge-rr' : 'badge-ht';
-        td.innerHTML = `<span class="badge ${cls}">${row[c]||'-'}</span>`;
-      } else {
-        td.textContent = row[c] !== undefined ? row[c] : '-';
-      }
+      if (c==='Lead_Type') {
+        const lt=(row[c]||'').toUpperCase();
+        const cls=lt==='SC+'?'badge-sc':lt==='RR'?'badge-rr':'badge-ht';
+        td.innerHTML=`<span class="badge ${cls}">${row[c]||'-'}</span>`;
+      } else { td.textContent = row[c]!==undefined?row[c]:'-'; }
       tr.appendChild(td);
     });
-    tbody.appendChild(tr);
+    tb.appendChild(tr);
   });
-  tbl.appendChild(tbody);
+  tbl.appendChild(tb);
 }
 
-function showParseError(msg) {
-  const el = document.getElementById('parse-error');
-  el.textContent = '⚠ ' + msg;
-  el.style.display = 'block';
-}
-
-/* ---- UPLOAD TO JSONBIN ---- */
+/* JSONBIN UPLOAD */
 async function uploadToJSONBin() {
   const masterKey = document.getElementById('master-key').value.trim();
   const binId = document.getElementById('bin-id').value.trim();
+  if (!masterKey) { showErr('upload-error','Enter your JSONBin Master Key in Step 1.'); return; }
+  if (!mappedData.length) { showErr('upload-error','No mapped data. Complete Step 3 first.'); return; }
 
-  if (!masterKey) {
-    showUploadError('Please enter your JSONBin Master Key in Step 1.');
-    return;
-  }
-  if (parsedData.length === 0) {
-    showUploadError('No data to upload. Please select a file first.');
-    return;
-  }
-
-  document.getElementById('upload-btn').disabled = true;
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true;
   document.getElementById('success-box').style.display = 'none';
   document.getElementById('upload-error').style.display = 'none';
 
-  const progressWrap = document.getElementById('progress-wrap');
-  const progressFill = document.getElementById('progress-fill');
-  const progressText = document.getElementById('progress-text');
-  progressWrap.style.display = 'block';
-  progressFill.style.width = '30%';
-  progressText.textContent = 'Connecting to JSONBin…';
+  const pw = document.getElementById('progress-wrap');
+  const pf = document.getElementById('progress-fill');
+  const pt = document.getElementById('progress-text');
+  pw.style.display = 'block';
+  pf.style.width = '20%';
+  pt.textContent = 'Connecting to JSONBin…';
 
-  const payload = {
-    updated: new Date().toISOString(),
-    records: parsedData
-  };
+  const payload = { updated: new Date().toISOString(), records: mappedData };
 
   try {
-    let url, method, headers;
+    pf.style.width = '50%';
+    pt.textContent = 'Uploading ' + mappedData.length + ' rows…';
+
+    // Build request
+    const headers = { 'Content-Type':'application/json', 'X-Master-Key': masterKey };
+    let url, method;
+
     if (binId) {
-      url = `https://api.jsonbin.io/v3/b/${binId}`;
+      url = 'https://api.jsonbin.io/v3/b/' + binId;
       method = 'PUT';
-      headers = { 'Content-Type':'application/json', 'X-Master-Key': masterKey };
     } else {
       url = 'https://api.jsonbin.io/v3/b';
       method = 'POST';
-      headers = {
-        'Content-Type':'application/json',
-        'X-Master-Key': masterKey,
-        'X-Bin-Name': 'jca-portal-data',
-        'X-Bin-Private': 'false'
-      };
+      headers['X-Bin-Name'] = 'jca-portal-data';
+      headers['X-Bin-Private'] = 'false'; // public so JCAs can read without key
     }
 
-    progressFill.style.width = '60%';
-    progressText.textContent = 'Uploading data…';
-
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: JSON.stringify(payload)
-    });
-
-    progressFill.style.width = '90%';
+    const res = await fetch(url, { method, headers, body: JSON.stringify(payload) });
+    pf.style.width = '85%';
 
     if (!res.ok) {
-      const errData = await res.json().catch(()=>({}));
-      throw new Error(errData.message || `HTTP ${res.status}`);
+      let msg = 'HTTP ' + res.status;
+      try { const d = await res.json(); msg = d.message || msg; } catch(e){}
+      if (res.status===401) msg = 'Invalid Master Key — please check it at jsonbin.io → API Keys.';
+      if (res.status===404) msg = 'Bin ID not found. Leave it blank to create a new bin.';
+      if (res.status===429) msg = 'Too many requests — wait 1 minute and try again.';
+      if (res.status===400) msg = 'Bad request — data may be too large. Try reducing the number of rows.';
+      throw new Error(msg);
     }
 
     const data = await res.json();
-    const newBinId = data.metadata?.id || binId;
-    progressFill.style.width = '100%';
-    progressText.textContent = 'Done!';
+    const newBinId = (data.metadata && data.metadata.id) ? data.metadata.id : binId;
+    pf.style.width = '100%';
+    pt.textContent = '✅ Upload complete!';
 
-    // Save bin ID back
     document.getElementById('bin-id').value = newBinId;
     document.getElementById('bin-id-display').textContent = newBinId;
+    ['card1','card4'].forEach(id => {
+      document.getElementById(id).classList.remove('active');
+      document.getElementById(id).classList.add('done');
+    });
+    document.getElementById('sn4').textContent = '✓';
     document.getElementById('sn1').textContent = '✓';
-    document.getElementById('card1').classList.remove('active');
-    document.getElementById('card1').classList.add('done');
-    document.getElementById('card2').classList.add('done');
 
-    // Build JCA URL
-    const baseURL = window.location.href.replace('admin.html','index.html');
-    const jcaLink = `${baseURL}?bin=${newBinId}`;
-    document.getElementById('jca-url').textContent = jcaLink;
+    // JCA link
+    const base = window.location.href.replace(/[?#].*$/,'').replace(/admin\.html$/,'index.html');
+    const link = base + '?bin=' + newBinId;
+    document.getElementById('jca-url').textContent = link;
     document.getElementById('success-box').style.display = 'block';
-
-    setTimeout(() => { progressWrap.style.display = 'none'; }, 1200);
+    setTimeout(() => { pw.style.display = 'none'; }, 1500);
 
   } catch(err) {
-    progressWrap.style.display = 'none';
-    document.getElementById('upload-btn').disabled = false;
-    showUploadError('Upload failed: ' + err.message + '. Check your Master Key and internet connection.');
+    pw.style.display = 'none';
+    btn.disabled = false;
+    let msg = err.message || String(err);
+    if (/failed to fetch|networkerror|cors|load failed/i.test(msg)) {
+      msg = '❌ Network / CORS error. Most likely cause: wrong Master Key. Please verify at jsonbin.io → API Keys and try again.';
+    }
+    showErr('upload-error', msg);
   }
 }
 
-function showUploadError(msg) {
-  const el = document.getElementById('upload-error');
-  el.textContent = '⚠ ' + msg;
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.innerHTML = '⚠ ' + msg;
   el.style.display = 'block';
 }
 
 function copyURL() {
   const url = document.getElementById('jca-url').textContent;
   navigator.clipboard.writeText(url).then(() => {
-    const btn = document.querySelector('.s-copy-btn');
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => btn.textContent = 'Copy link', 2000);
-  });
+    const b = document.querySelectorAll('.s-btn')[0];
+    b.textContent = '✅ Copied!';
+    setTimeout(() => b.textContent = '📋 Copy JCA link', 2000);
+  }).catch(() => fallbackCopy(url));
 }
 
-// Activate step 1 on key input
+function copyBinId() {
+  const bid = document.getElementById('bin-id-display').textContent;
+  navigator.clipboard.writeText(bid).then(() => {
+    const b = document.querySelectorAll('.s-btn')[1];
+    b.textContent = '✅ Copied!';
+    setTimeout(() => b.textContent = 'Copy Bin ID', 2000);
+  }).catch(() => fallbackCopy(bid));
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
 document.getElementById('master-key').addEventListener('input', function() {
-  if (this.value.trim()) {
-    document.getElementById('card1').classList.add('active');
-  }
+  if (this.value.length > 10) document.getElementById('card2').classList.add('active');
 });
 </script>
 </body>
