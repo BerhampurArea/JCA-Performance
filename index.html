@@ -5,199 +5,156 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Performance — JCA Portal</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f4f6fb;
-  --surface:#ffffff;
-  --surface2:#f0f2f5;
-  --surface3:#e4e8ef;
-  --border:rgba(0,0,0,0.08);
-  --border2:rgba(0,0,0,0.14);
-  --text1:#0f1117;
-  --text2:#5a6272;
-  --text3:#9aa3b2;
-  --blue:#1a6ef7;
-  --blue-dim:#eef3fe;
-  --blue-text:#1652c4;
-  --green:#1a9b52;
-  --green-dim:#eafaf0;
-  --green-text:#147840;
-  --orange:#c96b0a;
-  --orange-dim:#fff4e6;
-  --orange-text:#a25508;
-  --red:#d93025;
-  --red-dim:#fdf2f1;
-  --red-text:#b72019;
-  --radius:10px;
-  --radius-lg:14px;
-  --font:'DM Sans',sans-serif;
-  --mono:'DM Mono',monospace;
-  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.06);
-  --shadow-sm:0 1px 2px rgba(0,0,0,0.06);
+  --bg:#f4f6fb;--surface:#fff;--surface2:#f0f2f5;--surface3:#e4e8ef;
+  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
+  --text1:#0f1117;--text2:#5a6272;--text3:#9aa3b2;
+  --blue:#1a6ef7;--blue-dim:#eef3fe;--blue-t:#1652c4;
+  --green:#1a9b52;--green-dim:#eafaf0;--green-t:#147840;
+  --orange:#c96b0a;--orange-dim:#fff4e6;--orange-t:#a25508;
+  --red:#d93025;--red-dim:#fdf2f1;
+  --r:10px;--rl:14px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+  --sh-sm:0 1px 2px rgba(0,0,0,.06);
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text1);min-height:100vh}
-
 /* TOPBAR */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:58px;padding:0 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}
-.jio-badge{background:var(--blue);color:#fff;font-weight:800;font-size:13px;padding:4px 12px;border-radius:6px;letter-spacing:0.3px}
-.topbar-name{font-size:15px;font-weight:700;color:var(--text1)}
-.topbar-right{margin-left:auto}
-
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:56px;padding:0 20px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm)}
+.jio{background:var(--blue);color:#fff;font-weight:800;font-size:12px;padding:3px 10px;border-radius:5px;letter-spacing:.3px}
+.tb-title{font-size:15px;font-weight:700}
+.tb-right{margin-left:auto}
 /* MAIN */
-.main{max-width:820px;margin:0 auto;padding:28px 16px 60px}
-
-/* SCREEN */
-.screen{display:none}
-.screen.active{display:block}
-
+.main{max-width:820px;margin:0 auto;padding:24px 14px 60px}
+/* SCREENS */
+.scr{display:none}.scr.active{display:block}
 /* LOOKUP */
-.lookup-outer{display:flex;flex-direction:column;align-items:center;padding-top:16px}
-.lookup-card{background:var(--surface);border-radius:var(--radius-lg);padding:40px 36px;max-width:440px;width:100%;box-shadow:var(--shadow);text-align:center}
-.lookup-card .icon-wrap{width:60px;height:60px;background:var(--blue-dim);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
-.lookup-card h2{font-size:22px;font-weight:800;color:var(--text1);margin-bottom:8px}
-.lookup-card .desc{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:28px}
-.prm-input-wrap{position:relative;margin-bottom:10px}
-.prm-input-wrap input{width:100%;height:50px;border:2px solid var(--border2);border-radius:var(--radius);padding:0 16px;font-size:18px;font-weight:700;font-family:var(--mono);color:var(--text1);background:var(--surface);outline:none;text-transform:uppercase;text-align:center;letter-spacing:2px;transition:border-color .15s}
-.prm-input-wrap input:focus{border-color:var(--blue)}
-.btn-lookup{width:100%;height:48px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;letter-spacing:0.3px}
-.btn-lookup:hover{opacity:.88}
-.btn-lookup:disabled{opacity:.4;cursor:not-allowed}
-.error-msg{font-size:12px;color:var(--red);margin-bottom:10px;display:none;background:var(--red-dim);padding:8px 12px;border-radius:6px}
-.loading-msg{font-size:13px;color:var(--text2);margin-bottom:10px;display:none;padding:8px 12px}
-.bin-manual{margin-top:20px;border-top:1px solid var(--border);padding-top:16px}
-.bin-manual p{font-size:11px;color:var(--text3);margin-bottom:8px}
-.bin-manual input{width:100%;height:36px;border:1px solid var(--border2);border-radius:var(--radius);padding:0 12px;font-size:12px;font-family:var(--mono);color:var(--text1);background:var(--surface);outline:none;text-align:left;letter-spacing:0;font-weight:400}
-.bin-manual input:focus{border-color:var(--blue)}
-
+.lk-wrap{display:flex;flex-direction:column;align-items:center;padding-top:12px}
+.lk-card{background:var(--surface);border-radius:var(--rl);padding:36px 32px;max-width:420px;width:100%;box-shadow:var(--sh);text-align:center}
+.lk-icon{width:56px;height:56px;background:var(--blue-dim);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px}
+.lk-card h2{font-size:21px;font-weight:800;margin-bottom:7px}
+.lk-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.prm-inp{width:100%;height:52px;border:2px solid var(--border2);border-radius:var(--r);padding:0 16px;font-size:20px;font-weight:800;font-family:var(--mono);color:var(--text1);background:var(--surface);outline:none;text-transform:uppercase;text-align:center;letter-spacing:2px;transition:border-color .15s;margin-bottom:10px}
+.prm-inp:focus{border-color:var(--blue)}
+.btn-look{width:100%;height:48px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;letter-spacing:.2px}
+.btn-look:hover{opacity:.88}
+.btn-look:disabled{opacity:.4;cursor:not-allowed}
+.err-msg{font-size:12px;color:var(--red);margin-bottom:10px;display:none;background:var(--red-dim);padding:8px 12px;border-radius:6px}
+.loading{font-size:13px;color:var(--text2);padding:8px 12px;display:none}
 /* DASHBOARD */
-.dash-hero{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
-.hero-info .jca-name{font-size:24px;font-weight:800;color:var(--text1)}
-.hero-info .jca-meta{font-size:13px;color:var(--text2);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap}
-.meta-chip{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--text2)}
-.btn-back{height:36px;padding:0 16px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s}
+.dash-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.jca-name{font-size:22px;font-weight:800}
+.jca-meta{font-size:12px;color:var(--text2);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+.meta-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--text2)}
+.btn-back{height:34px;padding:0 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s}
 .btn-back:hover{background:var(--surface2)}
-
-/* LAST UPDATED BADGE */
-.updated-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);background:var(--surface2);border-radius:20px;padding:3px 10px;margin-bottom:20px}
+/* UPDATED BADGE */
+.upd-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);background:var(--surface2);border-radius:20px;padding:3px 10px;margin-bottom:18px}
 .dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
-
 /* METRICS */
-.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:22px}
-.metric-card{background:var(--surface);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
-.metric-card.accent{background:var(--blue);border-color:var(--blue)}
-.m-icon{font-size:18px;margin-bottom:8px}
-.m-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
-.metric-card.accent .m-label{color:rgba(255,255,255,0.75)}
-.m-value{font-size:26px;font-weight:800;color:var(--text1);line-height:1}
-.metric-card.accent .m-value{color:#fff}
-.m-sub{font-size:11px;color:var(--text3);margin-top:4px}
-.metric-card.accent .m-sub{color:rgba(255,255,255,0.6)}
-
-/* LEAD TYPE CARDS */
-.section-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;margin-top:24px}
-.lt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
-@media(max-width:500px){.lt-grid{grid-template-columns:1fr}}
-.lt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm)}
-.lt-head{font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:10px}
-.lt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.lt-num{font-size:26px;font-weight:800;color:var(--text1);line-height:1}
-.lt-num-sub{font-size:11px;font-weight:400;color:var(--text3)}
-.lt-stats{font-size:12px;color:var(--text2);margin-top:5px}
-.mini-bar{height:5px;border-radius:3px;background:var(--surface3);margin-top:10px;overflow:hidden}
-.mini-fill{height:100%;border-radius:3px;transition:width .4s}
-.lt-pct-label{font-size:11px;color:var(--text3);margin-top:5px}
-
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(136px,1fr));gap:10px;margin-bottom:20px}
+.mc{background:var(--surface);border-radius:var(--r);padding:15px 16px;box-shadow:var(--sh-sm);border:1px solid var(--border)}
+.mc.acc{background:var(--blue);border-color:var(--blue)}
+.m-icon{font-size:18px;margin-bottom:7px}
+.m-lbl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.mc.acc .m-lbl{color:rgba(255,255,255,.75)}
+.m-val{font-size:24px;font-weight:800;line-height:1}
+.mc.acc .m-val{color:#fff}
+.m-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.mc.acc .m-sub{color:rgba(255,255,255,.6)}
+/* SEC LABEL */
+.sec-lbl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;margin-top:22px}
+/* LT GRID */
+.ltg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+@media(max-width:480px){.ltg{grid-template-columns:1fr}}
+.ltc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--sh-sm)}
+.lt-head{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.lt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lt-num{font-size:24px;font-weight:800;line-height:1}
+.lt-sub{font-size:11px;font-weight:400;color:var(--text3)}
+.lt-stats{font-size:12px;color:var(--text2);margin-top:4px}
+.mbar{height:5px;border-radius:3px;background:var(--surface3);margin-top:8px;overflow:hidden}
+.mfill{height:100%;border-radius:3px;transition:width .4s}
+.lt-pct{font-size:11px;color:var(--text3);margin-top:4px}
 /* TABS */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;margin-top:24px}
-.tab-btn{font-size:13px;font-weight:600;padding:10px 20px;border:none;background:none;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;font-family:var(--font);border-radius:0}
-.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
-.tab-pane{display:none}
-.tab-pane.active{display:block}
-
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;margin-top:22px}
+.tb{font-size:13px;font-weight:600;padding:9px 18px;border:none;background:none;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;font-family:var(--font);border-radius:0}
+.tb.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tp{display:none}.tp.active{display:block}
 /* TABLE */
-.table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto;box-shadow:var(--shadow-sm)}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
-th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
+.tw{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;overflow-x:auto;box-shadow:var(--sh-sm)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:540px}
+th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);padding:9px 13px;background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr.lap-subtotal td{background:var(--surface2);font-weight:700;font-size:12px;color:var(--text2)}
-.tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:0.3px}
-.tag-sc{background:var(--blue-dim);color:var(--blue-text)}
-.tag-rr{background:var(--green-dim);color:var(--green-text)}
-.tag-ht{background:var(--orange-dim);color:var(--orange-text)}
-.pct-bar{display:inline-block;vertical-align:middle;width:52px;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-right:6px}
-.pct-fill{height:100%;border-radius:3px}
-
+tr.sub td{background:var(--surface2);font-weight:700;font-size:12px;color:var(--text2)}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.2px}
+.t-sc{background:var(--blue-dim);color:var(--blue-t)}
+.t-rr{background:var(--green-dim);color:var(--green-t)}
+.t-ht{background:var(--orange-dim);color:var(--orange-t)}
+.pbar{display:inline-block;vertical-align:middle;width:48px;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-right:5px}
+.pfill{height:100%;border-radius:3px}
 /* CHART */
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;box-shadow:var(--shadow-sm)}
-.chart-inner{position:relative;width:100%;height:260px}
-.chart-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font-size:12px;color:var(--text2)}
-.legend-item{display:flex;align-items:center;gap:5px}
-.legend-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:18px 22px;box-shadow:var(--sh-sm)}
+.chart-inner{position:relative;width:100%;height:250px}
+.chart-leg{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:12px;color:var(--text2)}
+.leg-i{display:flex;align-items:center;gap:5px}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-top:1px solid var(--border);margin-top:20px}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <span class="jio-badge">JIO</span>
-  <span class="topbar-name">My Performance</span>
-  <div class="topbar-right" id="topbar-right"></div>
+  <span class="jio">JIO</span>
+  <span class="tb-title">My Performance</span>
+  <div class="tb-right" id="tb-right"></div>
 </div>
 
 <div class="main">
 
-  <!-- SCREEN: LOOKUP -->
-  <div id="screen-lookup" class="screen active">
-    <div class="lookup-outer">
-      <div class="lookup-card">
-        <div class="icon-wrap">📊</div>
+  <!-- LOOKUP SCREEN -->
+  <div id="scr-lookup" class="scr active">
+    <div class="lk-wrap">
+      <div class="lk-card">
+        <div class="lk-icon">📊</div>
         <h2>View your performance</h2>
-        <p class="desc">Enter your PRM ID to instantly see your leads, conversions, effective calls and commission.</p>
-
-        <div class="error-msg" id="error-msg"></div>
-        <div class="loading-msg" id="loading-msg">⏳ Fetching data…</div>
-
-        <div class="prm-input-wrap">
-          <input type="text" id="prm-input" placeholder="PRM ID" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
-        </div>
-        <button class="btn-lookup" id="btn-lookup" onclick="lookupPRM()">View my dashboard →</button>
-
-        <div class="bin-manual" id="bin-manual">
-          <p>Bin ID (auto-filled from link, or enter manually)</p>
-          <input type="text" id="bin-id-input" placeholder="JSONBin Bin ID" style="font-family:var(--mono)">
+        <p class="lk-desc">Enter your PRM ID to instantly see your leads, conversions, effective calls and commission.</p>
+        <div class="err-msg" id="err-msg"></div>
+        <div class="loading" id="loading">⏳ Loading data…</div>
+        <input class="prm-inp" type="text" id="prm-inp" placeholder="PRM ID" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="btn-look" id="btn-look" onclick="lookup()">View my dashboard →</button>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:7px">Sheet URL (auto-filled from link)</div>
+          <input type="text" id="sheet-inp" placeholder="Paste Google Sheets CSV URL if needed" style="width:100%;height:34px;border:1px solid var(--border2);border-radius:8px;padding:0 10px;font-size:11px;font-family:var(--mono);color:var(--text1);background:var(--surface);outline:none" spellcheck="false">
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN: DASHBOARD -->
-  <div id="screen-dash" class="screen">
-    <div class="dash-hero">
-      <div class="hero-info">
+  <!-- DASHBOARD SCREEN -->
+  <div id="scr-dash" class="scr">
+    <div class="dash-top">
+      <div>
         <div class="jca-name" id="jca-name">—</div>
         <div class="jca-meta" id="jca-meta"></div>
       </div>
       <button class="btn-back" onclick="goBack()">← Back</button>
     </div>
-    <div class="updated-badge" id="updated-badge"><span class="dot-live"></span> — </div>
+    <div class="upd-badge" id="upd-badge"><span class="dot-live"></span> Live data from Google Sheets</div>
 
-    <div class="metrics-grid" id="metrics-grid"></div>
-
-    <div class="section-label">Lead type breakdown</div>
-    <div class="lt-grid" id="lt-grid"></div>
+    <div class="mgrid" id="mgrid"></div>
+    <div class="sec-lbl">Lead type breakdown</div>
+    <div class="ltg" id="ltg"></div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('lap',this)">Lap-wise breakdown</button>
-      <button class="tab-btn" onclick="switchTab('chart',this)">Conversion chart</button>
+      <button class="tb active" onclick="switchTab('lap',this)">Lap-wise breakdown</button>
+      <button class="tb" onclick="switchTab('chart',this)">Conversion chart</button>
     </div>
-
-    <div id="tab-lap" class="tab-pane active">
-      <div class="table-wrap">
+    <div id="tp-lap" class="tp active">
+      <div class="tw">
         <table>
           <thead><tr>
             <th>Lap</th><th>Lead type</th><th>Allocated</th><th>Converted</th>
@@ -207,271 +164,214 @@ footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-t
         </table>
       </div>
     </div>
-
-    <div id="tab-chart" class="tab-pane">
+    <div id="tp-chart" class="tp">
       <div class="chart-card">
-        <div class="chart-inner"><canvas id="lapChart" role="img" aria-label="Lap conversion chart"></canvas></div>
-        <div class="chart-legend" id="chart-legend"></div>
+        <div class="chart-inner"><canvas id="lapChart" role="img" aria-label="Conversion chart"></canvas></div>
+        <div class="chart-leg" id="chart-leg"></div>
       </div>
     </div>
-
-    <footer>Jio · JCA Performance Portal · Data loaded from cloud · Internal use only</footer>
+    <footer>Jio · JCA Performance Portal · Data from Google Sheets · Internal use only</footer>
   </div>
 
-</div><!-- /main -->
+</div>
 
 <script>
-let chartInst = null;
-let cachedRecords = null;
+let chartInst=null, sheetRecords=null, sheetUpdated='';
 
-/* ---- READ BIN ID FROM URL ---- */
-function getBinIdFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('bin') || '';
-}
+/* ── READ PARAMS FROM URL ── */
+function getParam(name){return new URLSearchParams(window.location.search).get(name)||'';}
 
-window.addEventListener('load', function() {
-  const binId = getBinIdFromURL();
-  if (binId) {
-    document.getElementById('bin-id-input').value = binId;
-  }
+window.addEventListener('load',function(){
+  const sheetUrl=decodeURIComponent(getParam('sheet')||'');
+  if(sheetUrl) document.getElementById('sheet-inp').value=sheetUrl;
 });
 
-document.getElementById('prm-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') lookupPRM();
-});
+document.getElementById('prm-inp').addEventListener('keydown',function(e){if(e.key==='Enter')lookup();});
 
-/* ---- LOOKUP ---- */
-async function lookupPRM() {
-  const prm = document.getElementById('prm-input').value.trim().toUpperCase();
-  const binId = document.getElementById('bin-id-input').value.trim();
-  const errEl = document.getElementById('error-msg');
-  const loadEl = document.getElementById('loading-msg');
-  const btn = document.getElementById('btn-lookup');
+/* ── PARSE CSV ── */
+function parseCSV(text){
+  const rows=[]; let cur=[],field='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(c==='"'){
+      if(inQ&&text[i+1]==='"'){field+='"';i++;}
+      else inQ=!inQ;
+    } else if(c===','&&!inQ){cur.push(field.trim());field='';}
+    else if((c==='\n'||c==='\r')&&!inQ){
+      cur.push(field.trim());field='';
+      if(cur.some(v=>v!==''))rows.push(cur);
+      cur=[];
+      if(c==='\r'&&text[i+1]==='\n')i++;
+    } else field+=c;
+  }
+  if(field||cur.length){cur.push(field.trim());if(cur.some(v=>v!==''))rows.push(cur);}
+  return rows;
+}
 
-  errEl.style.display = 'none';
-  if (!prm) { showError('Please enter your PRM ID.'); return; }
-  if (!binId) { showError('No data source found. Please use the link provided by your admin.'); return; }
+async function fetchSheet(sheetUrl){
+  // Use corsproxy.io to bypass CORS on Google Sheets public CSV
+  const proxy='https://corsproxy.io/?'+encodeURIComponent(sheetUrl);
+  const res=await fetch(proxy);
+  if(!res.ok) throw new Error('Cannot load sheet (HTTP '+res.status+'). Make sure it is published.');
+  const text=await res.text();
+  const rows=parseCSV(text);
+  if(rows.length<2) throw new Error('Sheet is empty or has no data rows.');
+  const headers=rows[0];
+  if(!headers.includes('PRM_ID')) throw new Error('Column PRM_ID not found in sheet. Use the Admin page to set up the sheet correctly.');
+  const records=rows.slice(1).map(row=>{
+    const obj={};
+    headers.forEach((h,i)=>{
+      const v=(row[i]||'').trim();
+      const nums=['Lap','Allocated','Converted','Eff_Call','Commission'];
+      obj[h]=nums.includes(h)?(isNaN(+v)?0:+v):v;
+    });
+    return obj;
+  }).filter(r=>r.PRM_ID);
+  return records;
+}
 
-  btn.disabled = true;
-  loadEl.style.display = 'block';
+/* ── LOOKUP ── */
+async function lookup(){
+  const prm=document.getElementById('prm-inp').value.trim().toUpperCase();
+  const sheetUrl=document.getElementById('sheet-inp').value.trim();
+  const errEl=document.getElementById('err-msg');
+  const loadEl=document.getElementById('loading');
+  const btn=document.getElementById('btn-look');
+  errEl.style.display='none';
+  if(!prm){showError('Please enter your PRM ID.');return;}
+  if(!sheetUrl){showError('No data source. Please use the link shared by your admin.');return;}
 
-  try {
-    let records;
-    // Use cache if available
-    if (cachedRecords) {
-      records = cachedRecords;
-    } else {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-        headers: { 'X-Bin-Meta': 'false' }
-      });
-      if (!res.ok) throw new Error(`Could not load data (HTTP ${res.status}). Please use the correct link.`);
-      const data = await res.json();
-      // JSONBin v3 latest returns {record: {...}}
-      const record = data.record || data;
-      records = record.records || record;
-      cachedRecords = records;
-      // Show last updated
-      if (record.updated) {
-        const d = new Date(record.updated);
-        document.getElementById('updated-badge').innerHTML = `<span class="dot-live"></span> Data updated: ${d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} ${d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
-      }
-    }
-
-    const rows = records.filter(r => String(r.PRM_ID || '').toUpperCase() === prm);
-    if (rows.length === 0) { throw new Error('PRM ID not found. Please check and try again.'); }
-
-    loadEl.style.display = 'none';
-    btn.disabled = false;
-    renderDash(rows, prm);
-  } catch(err) {
-    loadEl.style.display = 'none';
-    btn.disabled = false;
-    showError(err.message);
+  btn.disabled=true; loadEl.style.display='block';
+  try{
+    // Fetch fresh every time (no stale cache)
+    const records=await fetchSheet(sheetUrl);
+    sheetRecords=records;
+    const rows=records.filter(r=>String(r.PRM_ID||'').toUpperCase()===prm);
+    if(!rows.length) throw new Error('PRM ID "'+prm+'" not found. Please check and try again.');
+    loadEl.style.display='none'; btn.disabled=false;
+    renderDash(rows,prm);
+  }catch(err){
+    loadEl.style.display='none'; btn.disabled=false;
+    let msg=err.message;
+    if(/failed to fetch|networkerror|cors|load failed/i.test(msg))
+      msg='Cannot load data. Check your internet connection and try again.';
+    showError(msg);
   }
 }
 
-function showError(msg) {
-  const el = document.getElementById('error-msg');
-  el.textContent = '⚠ ' + msg;
-  el.style.display = 'block';
-}
+function showError(msg){const el=document.getElementById('err-msg');el.textContent='⚠ '+msg;el.style.display='block';}
 
-/* ---- RENDER DASHBOARD ---- */
-function renderDash(rows, prm) {
-  const r0 = rows[0];
-  document.getElementById('jca-name').textContent = r0.Name || prm;
-
-  const laps = [...new Set(rows.map(r => r.Lap))].sort((a,b) => +a - +b);
-  const metaEl = document.getElementById('jca-meta');
-  metaEl.innerHTML = [
+/* ── RENDER DASHBOARD ── */
+function renderDash(rows,prm){
+  const r0=rows[0];
+  document.getElementById('jca-name').textContent=r0.Name||prm;
+  const laps=[...new Set(rows.map(r=>r.Lap))].sort((a,b)=>+a-+b);
+  document.getElementById('jca-meta').innerHTML=[
     `<span class="meta-chip">🪪 ${prm}</span>`,
-    r0.JC_Code ? `<span class="meta-chip">🏪 JC: ${r0.JC_Code}</span>` : '',
+    r0.JC_Code?`<span class="meta-chip">🏪 JC: ${r0.JC_Code}</span>`:'',
     `<span class="meta-chip">🔄 ${laps.length} Lap(s)</span>`
   ].join('');
 
-  /* Summary */
-  const totAlloc = rows.reduce((s,r) => s+(+r.Allocated||0), 0);
-  const totConv  = rows.reduce((s,r) => s+(+r.Converted||0), 0);
-  const totEff   = rows.reduce((s,r) => s+(+r.Eff_Call||0), 0);
-  const totComm  = rows.reduce((s,r) => s+(+r.Commission||0), 0);
-  const convPct  = totAlloc > 0 ? Math.round(totConv/totAlloc*100) : 0;
-
-  document.getElementById('metrics-grid').innerHTML = `
-    <div class="metric-card">
-      <div class="m-icon">📋</div>
-      <div class="m-label">Leads allocated</div>
-      <div class="m-value">${totAlloc}</div>
-      <div class="m-sub">all types</div>
-    </div>
-    <div class="metric-card accent">
-      <div class="m-icon">✅</div>
-      <div class="m-label">Converted</div>
-      <div class="m-value">${totConv}</div>
-      <div class="m-sub">activations</div>
-    </div>
-    <div class="metric-card">
-      <div class="m-icon">📈</div>
-      <div class="m-label">Conversion %</div>
-      <div class="m-value">${convPct}%</div>
-      <div class="m-sub">overall rate</div>
-    </div>
-    <div class="metric-card">
-      <div class="m-icon">📞</div>
-      <div class="m-label">Effective calls</div>
-      <div class="m-value">${totEff}</div>
-      <div class="m-sub">&lt;40 sec excluded</div>
-    </div>
-    <div class="metric-card">
-      <div class="m-icon">💰</div>
-      <div class="m-label">Commission</div>
-      <div class="m-value">₹${totComm.toLocaleString('en-IN')}</div>
-      <div class="m-sub">total earned</div>
-    </div>
-  `;
+  /* Metrics */
+  const totA=rows.reduce((s,r)=>s+(+r.Allocated||0),0);
+  const totC=rows.reduce((s,r)=>s+(+r.Converted||0),0);
+  const totE=rows.reduce((s,r)=>s+(+r.Eff_Call||0),0);
+  const totM=rows.reduce((s,r)=>s+(+r.Commission||0),0);
+  const pct=totA>0?Math.round(totC/totA*100):0;
+  document.getElementById('mgrid').innerHTML=`
+    <div class="mc"><div class="m-icon">📋</div><div class="m-lbl">Leads allocated</div><div class="m-val">${totA}</div><div class="m-sub">all types</div></div>
+    <div class="mc acc"><div class="m-icon">✅</div><div class="m-lbl">Converted</div><div class="m-val">${totC}</div><div class="m-sub">activations</div></div>
+    <div class="mc"><div class="m-icon">📈</div><div class="m-lbl">Conversion %</div><div class="m-val">${pct}%</div><div class="m-sub">overall</div></div>
+    <div class="mc"><div class="m-icon">📞</div><div class="m-lbl">Effective calls</div><div class="m-val">${totE}</div><div class="m-sub">&lt;40 sec excl.</div></div>
+    <div class="mc"><div class="m-icon">💰</div><div class="m-lbl">Commission</div><div class="m-val">₹${totM.toLocaleString('en-IN')}</div><div class="m-sub">total earned</div></div>`;
 
   /* Lead type cards */
-  const ltDefs = [
-    { type:'SC+',   color:'#1a6ef7', bgColor:'var(--blue-dim)',   textColor:'var(--blue-text)' },
-    { type:'RR',    color:'#1a9b52', bgColor:'var(--green-dim)',  textColor:'var(--green-text)' },
-    { type:'HT WB', color:'#c96b0a', bgColor:'var(--orange-dim)', textColor:'var(--orange-text)' },
+  const ltDefs=[
+    {t:'SC+',c:'#1a6ef7',dim:'var(--blue-dim)',tc:'var(--blue-t)'},
+    {t:'RR',c:'#1a9b52',dim:'var(--green-dim)',tc:'var(--green-t)'},
+    {t:'HT WB',c:'#c96b0a',dim:'var(--orange-dim)',tc:'var(--orange-t)'},
   ];
-  document.getElementById('lt-grid').innerHTML = ltDefs.map(ld => {
-    const lr  = rows.filter(r => (r.Lead_Type||'').toUpperCase() === ld.type.toUpperCase());
-    const la  = lr.reduce((s,r) => s+(+r.Allocated||0), 0);
-    const lco = lr.reduce((s,r) => s+(+r.Converted||0), 0);
-    const le  = lr.reduce((s,r) => s+(+r.Eff_Call||0), 0);
-    const lp  = la > 0 ? Math.round(lco/la*100) : 0;
-    return `<div class="lt-card">
-      <div class="lt-head">
-        <span class="lt-dot" style="background:${ld.color}"></span>
-        <span style="color:${ld.textColor}">${ld.type}</span>
-      </div>
-      <div class="lt-num">${la} <span class="lt-num-sub">allocated</span></div>
-      <div class="lt-stats">${lco} converted · ${le} eff. calls</div>
-      <div class="mini-bar"><div class="mini-fill" style="width:${lp}%;background:${ld.color}"></div></div>
-      <div class="lt-pct-label">${lp}% conversion</div>
+  document.getElementById('ltg').innerHTML=ltDefs.map(ld=>{
+    const lr=rows.filter(r=>(r.Lead_Type||'').toUpperCase()===ld.t.toUpperCase());
+    const la=lr.reduce((s,r)=>s+(+r.Allocated||0),0);
+    const lc=lr.reduce((s,r)=>s+(+r.Converted||0),0);
+    const le=lr.reduce((s,r)=>s+(+r.Eff_Call||0),0);
+    const lp=la>0?Math.round(lc/la*100):0;
+    return `<div class="ltc">
+      <div class="lt-head"><span class="lt-dot" style="background:${ld.c}"></span><span style="color:${ld.tc}">${ld.t}</span></div>
+      <div class="lt-num">${la} <span class="lt-sub">allocated</span></div>
+      <div class="lt-stats">${lc} converted · ${le} eff. calls</div>
+      <div class="mbar"><div class="mfill" style="width:${lp}%;background:${ld.c}"></div></div>
+      <div class="lt-pct">${lp}% conversion</div>
     </div>`;
   }).join('');
 
   /* Lap table */
-  const tbody = document.getElementById('lap-tbody');
-  tbody.innerHTML = '';
-  laps.forEach(lap => {
-    const lapRows = rows.filter(r => r.Lap == lap);
-    lapRows.forEach((r, i) => {
-      const pct = (+r.Allocated) > 0 ? Math.round((+r.Converted)/(+r.Allocated)*100) : 0;
-      const barColor = pct >= 60 ? '#1a9b52' : pct >= 40 ? '#1a6ef7' : '#c96b0a';
-      const lt = (r.Lead_Type||'').toUpperCase();
-      const tagCls = lt==='SC+' ? 'tag-sc' : lt==='RR' ? 'tag-rr' : 'tag-ht';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-weight:${i===0?700:400};color:${i===0?'var(--text1)':'var(--text3)'}">
-          ${i===0 ? 'Lap '+lap : ''}
-        </td>
-        <td><span class="tag ${tagCls}">${r.Lead_Type||'-'}</span></td>
-        <td>${r.Allocated||0}</td>
-        <td>${r.Converted||0}</td>
-        <td>${r.Eff_Call||0}</td>
-        <td>
-          <span class="pct-bar"><span class="pct-fill" style="width:${pct}%;background:${barColor}"></span></span>${pct}%
-        </td>
-        <td style="font-weight:500">₹${(+(r.Commission||0)).toLocaleString('en-IN')}</td>
-      `;
+  const tbody=document.getElementById('lap-tbody'); tbody.innerHTML='';
+  laps.forEach(lap=>{
+    const lr=rows.filter(r=>r.Lap==lap);
+    lr.forEach((r,i)=>{
+      const p=(+r.Allocated)>0?Math.round((+r.Converted)/(+r.Allocated)*100):0;
+      const bc=p>=60?'#1a9b52':p>=40?'#1a6ef7':'#c96b0a';
+      const lt=(r.Lead_Type||'').toUpperCase();
+      const tc=lt==='SC+'?'t-sc':lt==='RR'?'t-rr':'t-ht';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td style="font-weight:${i===0?700:400};color:${i===0?'var(--text1)':'var(--text3)'}">${i===0?'Lap '+lap:''}</td>
+        <td><span class="tag ${tc}">${r.Lead_Type||'-'}</span></td>
+        <td>${r.Allocated||0}</td><td>${r.Converted||0}</td><td>${r.Eff_Call||0}</td>
+        <td><span class="pbar"><span class="pfill" style="width:${p}%;background:${bc}"></span></span>${p}%</td>
+        <td style="font-weight:500">₹${(+(r.Commission||0)).toLocaleString('en-IN')}</td>`;
       tbody.appendChild(tr);
     });
-    // Subtotal
-    const sum = lapRows.reduce((s,r) => ({
-      Allocated:  s.Allocated +(+r.Allocated||0),
-      Converted:  s.Converted +(+r.Converted||0),
-      Eff_Call:   s.Eff_Call  +(+r.Eff_Call||0),
-      Commission: s.Commission+(+r.Commission||0)
-    }), {Allocated:0,Converted:0,Eff_Call:0,Commission:0});
-    const sp = sum.Allocated > 0 ? Math.round(sum.Converted/sum.Allocated*100) : 0;
-    const str = document.createElement('tr');
-    str.className = 'lap-subtotal';
-    str.innerHTML = `
-      <td></td><td>Lap ${lap} total</td>
-      <td>${sum.Allocated}</td><td>${sum.Converted}</td><td>${sum.Eff_Call}</td>
-      <td>${sp}%</td>
-      <td>₹${sum.Commission.toLocaleString('en-IN')}</td>
-    `;
-    tbody.appendChild(str);
+    const s=lr.reduce((a,r)=>({A:a.A+(+r.Allocated||0),C:a.C+(+r.Converted||0),E:a.E+(+r.Eff_Call||0),M:a.M+(+r.Commission||0)}),{A:0,C:0,E:0,M:0});
+    const sp=s.A>0?Math.round(s.C/s.A*100):0;
+    const sub=document.createElement('tr'); sub.className='sub';
+    sub.innerHTML=`<td></td><td>Lap ${lap} total</td><td>${s.A}</td><td>${s.C}</td><td>${s.E}</td><td>${sp}%</td><td>₹${s.M.toLocaleString('en-IN')}</td>`;
+    tbody.appendChild(sub);
   });
 
   /* Chart */
-  const lapLabels = laps.map(l => 'Lap ' + l);
-  const ltChart = [
-    { type:'SC+',    allocColor:'rgba(26,110,247,0.2)',  convColor:'#1a6ef7', border:'#1a6ef7' },
-    { type:'RR',     allocColor:'rgba(26,155,82,0.2)',   convColor:'#1a9b52', border:'#1a9b52' },
-    { type:'HT WB',  allocColor:'rgba(201,107,10,0.2)',  convColor:'#c96b0a', border:'#c96b0a' },
+  const ltChart=[
+    {t:'SC+',  ac:'rgba(26,110,247,.2)',cc:'#1a6ef7',bc:'#1a6ef7'},
+    {t:'RR',   ac:'rgba(26,155,82,.2)', cc:'#1a9b52',bc:'#1a9b52'},
+    {t:'HT WB',ac:'rgba(201,107,10,.2)',cc:'#c96b0a',bc:'#c96b0a'},
   ];
-  const datasets = [];
-  ltChart.forEach(ld => {
-    const allocD = laps.map(lap =>
-      rows.filter(r => r.Lap==lap && (r.Lead_Type||'').toUpperCase()===ld.type.toUpperCase())
-          .reduce((s,r) => s+(+r.Allocated||0), 0));
-    const convD = laps.map(lap =>
-      rows.filter(r => r.Lap==lap && (r.Lead_Type||'').toUpperCase()===ld.type.toUpperCase())
-          .reduce((s,r) => s+(+r.Converted||0), 0));
-    datasets.push({label:ld.type+' Alloc', data:allocD, backgroundColor:ld.allocColor, borderColor:ld.border, borderWidth:1.5});
-    datasets.push({label:ld.type+' Conv',  data:convD,  backgroundColor:ld.convColor});
+  const lapLabels=laps.map(l=>'Lap '+l);
+  const datasets=[];
+  ltChart.forEach(ld=>{
+    const ad=laps.map(lap=>rows.filter(r=>r.Lap==lap&&(r.Lead_Type||'').toUpperCase()===ld.t.toUpperCase()).reduce((s,r)=>s+(+r.Allocated||0),0));
+    const cd=laps.map(lap=>rows.filter(r=>r.Lap==lap&&(r.Lead_Type||'').toUpperCase()===ld.t.toUpperCase()).reduce((s,r)=>s+(+r.Converted||0),0));
+    datasets.push({label:ld.t+' Alloc',data:ad,backgroundColor:ld.ac,borderColor:ld.bc,borderWidth:1.5});
+    datasets.push({label:ld.t+' Conv', data:cd,backgroundColor:ld.cc});
   });
-
-  if (chartInst) { chartInst.destroy(); chartInst = null; }
-  chartInst = new Chart(document.getElementById('lapChart'), {
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  chartInst=new Chart(document.getElementById('lapChart'),{
     type:'bar',
-    data:{ labels:lapLabels, datasets },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{mode:'index',intersect:false} },
-      scales:{
-        x:{ grid:{display:false}, ticks:{autoSkip:false} },
-        y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{stepSize:5} }
-      }
-    }
+    data:{labels:lapLabels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{grid:{display:false},ticks:{autoSkip:false}},y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{stepSize:5}}}}
   });
-
-  document.getElementById('chart-legend').innerHTML = ltChart.flatMap(ld => [
-    `<span class="legend-item"><span class="legend-sq" style="background:transparent;border:1.5px solid ${ld.border}"></span>${ld.type} Allocated</span>`,
-    `<span class="legend-item"><span class="legend-sq" style="background:${ld.convColor}"></span>${ld.type} Converted</span>`
+  document.getElementById('chart-leg').innerHTML=ltChart.flatMap(ld=>[
+    `<span class="leg-i"><span class="leg-sq" style="background:transparent;border:1.5px solid ${ld.bc}"></span>${ld.t} Allocated</span>`,
+    `<span class="leg-i"><span class="leg-sq" style="background:${ld.cc}"></span>${ld.t} Converted</span>`
   ]).join('');
 
-  document.getElementById('screen-lookup').classList.remove('active');
-  document.getElementById('screen-dash').classList.add('active');
+  document.getElementById('scr-lookup').classList.remove('active');
+  document.getElementById('scr-dash').classList.add('active');
   window.scrollTo(0,0);
 }
 
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
+function switchTab(name,btn){
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tp-'+name).classList.add('active');
   btn.classList.add('active');
 }
-
-function goBack() {
-  document.getElementById('screen-dash').classList.remove('active');
-  document.getElementById('screen-lookup').classList.add('active');
+function goBack(){
+  document.getElementById('scr-dash').classList.remove('active');
+  document.getElementById('scr-lookup').classList.add('active');
 }
 </script>
 </body>
