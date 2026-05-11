@@ -267,23 +267,39 @@ footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-t
 <script>
 let rawData=[], fileHeaders=[], mappedData=[], generatedLink='';
 
+// Actual Excel columns from JCA_Performance file
 const FIELDS=[
-  {k:'PRM_ID',req:true},{k:'Name',req:true},{k:'JC_Code',req:false},
-  {k:'Lap',req:true},{k:'Lead_Type',req:true},{k:'Allocated',req:true},
-  {k:'Converted',req:true},{k:'Eff_Call',req:true},{k:'Commission',req:false}
+  {k:'JCA PRM ID',req:true},{k:'JCA Name',req:true},{k:'JC Name',req:false},
+  {k:'JC / JP ID',req:false},{k:'Area',req:false},
+  {k:'HT+WB Leads ',req:false},{k:'HT (H+WB) EC Calls',req:false},
+  {k:'MTD MNP ORN (H+WB)',req:false},{k:'Total Activation (H+WB)',req:false},
+  {k:'Total SC+ Leads ',req:false},{k:'Total SC+ Leads Contacted ',req:false},
+  {k:'Total SC+ -Effective Calls ',req:false},{k:'Total SC+ RC Total ',req:false},
+  {k:'RR MTD-Leads Assigned',req:false},{k:'RR MTD - Called',req:false},
+  {k:'RR MTD-Effective Calls',req:false},{k:'RR MTD Total Recharges',req:false}
 ];
-const NUMS=['Lap','Allocated','Converted','Eff_Call','Commission'];
-const HINTS={
-  PRM_ID:   ['prm','prmid','prm_id','prm id','prm no','associate id','emp id','employee id','jca id','staff id','agent id'],
-  Name:     ['name','employee name','emp name','associate name','jca name','full name','agent name'],
-  JC_Code:  ['jc_code','jc code','jccode','jc','center code','jio center','center','branch','jc name'],
-  Lap:      ['lap','lap no','lap number','lap_no','cycle','period','batch','phase'],
-  Lead_Type:['lead_type','lead type','leadtype','type','lead','category','scheme','program'],
-  Allocated:['allocated','alloc','leads allocated','total allocated','assigned','total leads','allotted','target'],
-  Converted:['converted','conv','leads converted','activations','activation','total converted','success','done','achieved'],
-  Eff_Call: ['eff_call','eff call','effcall','effective call','effective calls','eff calls','calls','valid calls','productive','eff. call','eff.call'],
-  Commission:['commission','comm','earning','earnings','incentive','payout','amount','pay','income']
-};
+const NUMS=['HT+WB Leads ','HT (H+WB) EC Calls','MTD MNP ORN (H+WB)','Total Activation (H+WB)',
+  'Total SC+ Leads ','Total SC+ Leads Contacted ','Total SC+ -Effective Calls ','Total SC+ RC Total ',
+  'RR MTD-Leads Assigned','RR MTD - Called','RR MTD-Effective Calls','RR MTD Total Recharges'];
+// bestMatch does direct name matching since columns are well-defined
+function bestMatch(h){
+  // Normalize both sides and do fuzzy match
+  const n=h.toLowerCase().replace(/[\s\-_\+\.]+/g,'');
+  const fieldNorms={
+    'jcaprmid':'JCA PRM ID','jcaname':'JCA Name','jcname':'JC Name',
+    'jcjpid':'JC / JP ID','area':'Area',
+    'htwbleads':'HT+WB Leads ','hth+wbeccalls':'HT (H+WB) EC Calls',
+    'mtdmnpornh+wb':'MTD MNP ORN (H+WB)','totalactivationh+wb':'Total Activation (H+WB)',
+    'totalsclead':'Total SC+ Leads ','totalscleadscontacted':'Total SC+ Leads Contacted ',
+    'totalsceffectivecalls':'Total SC+ -Effective Calls ','totalscrctotal':'Total SC+ RC Total ',
+    'rrleadsassigned':'RR MTD-Leads Assigned','rrmtdcalled':'RR MTD - Called',
+    'rreffectivecalls':'RR MTD-Effective Calls','rrtotalrecharges':'RR MTD Total Recharges'
+  };
+  for(const[nk,field] of Object.entries(fieldNorms)){
+    if(n.includes(nk.replace(/[\s\-_\+\.]+/g,'').toLowerCase())) return field;
+  }
+  return '';
+}
 function bestMatch(h){
   const n=h.toLowerCase().replace(/[\s\-_\.]+/g,'');
   for(const[f,vs] of Object.entries(HINTS)){
@@ -423,38 +439,56 @@ function nextStep3(){
 }
 
 /* ── TEST GOOGLE SHEET ── */
+async function fetchViaProxy(url){
+  // Try multiple CORS proxies in sequence
+  const proxies=[
+    u=>'https://corsproxy.io/?'+encodeURIComponent(u),
+    u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+    u=>'https://thingproxy.freeboard.io/fetch/'+u,
+  ];
+  let lastErr='';
+  for(const makeProxy of proxies){
+    try{
+      const res=await fetch(makeProxy(url),{signal:AbortSignal.timeout(8000)});
+      if(res.status===403) throw new Error('HTTP_403');
+      if(!res.ok) throw new Error('HTTP_'+res.status);
+      const text=await res.text();
+      if(text.includes('<!DOCTYPE')||text.includes('<html')) throw new Error('Got HTML instead of CSV — sheet may not be published.');
+      return text;
+    }catch(e){ lastErr=e.message; }
+  }
+  // All proxies failed — give specific help
+  if(lastErr.includes('403')||lastErr.includes('HTTP_403')){
+    throw new Error('403_FORBIDDEN');
+  }
+  throw new Error(lastErr);
+}
+
 async function testAndSave(){
   const url=document.getElementById('sheet-url').value.trim();
   document.getElementById('ue').style.display='none';
   document.getElementById('sb').style.display='none';
   if(!url){showErr('ue','Please paste the Google Sheets CSV URL.');return;}
-  if(!url.includes('docs.google.com')){showErr('ue','URL must be a Google Sheets link. Example: https://docs.google.com/spreadsheets/d/.../pub?output=csv');return;}
+  if(!url.includes('docs.google.com')){showErr('ue','URL must be a Google Sheets publish link. It should contain "pub?". Example: https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv');return;}
+  if(!url.includes('output=csv')){showErr('ue','URL must end with output=csv. In Google Sheets go to File → Share → Publish to web → select CSV format → Publish.');return;}
+  if(!url.includes('/d/e/')){showErr('ue','This looks like an edit URL, not a published URL. The published URL contains "/d/e/". Go to File → Share → Publish to web → CSV → copy that URL.');return;}
 
   const btn=document.getElementById('test-btn'); btn.disabled=true;
   const pw=document.getElementById('pw'),pf=document.getElementById('pf'),pt=document.getElementById('pt');
-  pw.style.display='block'; pf.style.width='30%'; pt.textContent='Testing connection…';
-
-  // Build proxy URL to avoid CORS
-  const proxyUrl='https://corsproxy.io/?'+encodeURIComponent(url);
+  pw.style.display='block'; pf.style.width='20%'; pt.textContent='Testing connection…';
 
   try{
-    pf.style.width='60%'; pt.textContent='Fetching sheet data…';
-    const res=await fetch(proxyUrl);
-    if(!res.ok) throw new Error('Cannot reach Google Sheet (HTTP '+res.status+'). Make sure it is published.');
-    const text=await res.text();
+    pf.style.width='55%'; pt.textContent='Trying to reach Google Sheet…';
+    const text=await fetchViaProxy(url);
+    pf.style.width='85%'; pt.textContent='Validating data…';
     const lines=text.split('\n').filter(l=>l.trim());
-    if(lines.length<2) throw new Error('Sheet appears empty. Make sure data was pasted correctly.');
+    if(lines.length<2) throw new Error('Sheet appears empty. Make sure you pasted the mapped data and it has at least one data row.');
     const headers=parseCSVLine(lines[0]);
-    if(!headers.includes('PRM_ID')) throw new Error('Column PRM_ID not found in sheet. Make sure you pasted the mapped data correctly.');
-    pf.style.width='100%'; pt.textContent='✅ Connected! '+( lines.length-1)+' rows found.';
-
-    // Save sheet URL to localStorage for JCA page
-    localStorage.setItem('jca_sheet_url', url);
-
-    // Build JCA link
+    if(!headers.includes('PRM_ID')) throw new Error('Column "PRM_ID" not found in the sheet. Make sure you used the Admin page to copy the correctly mapped data.');
+    pf.style.width='100%'; pt.textContent='✅ Connected! '+(lines.length-1)+' rows found.';
+    localStorage.setItem('jca_sheet_url',url);
     const base=window.location.href.replace(/[?#].*$/).replace(/admin\.html$/,'index.html');
-    const encoded=encodeURIComponent(url);
-    generatedLink=base+'?sheet='+encoded;
+    generatedLink=base+'?sheet='+encodeURIComponent(url);
     document.getElementById('jca-url').textContent=generatedLink;
     document.getElementById('sb').style.display='block';
     done('c4','n4');
@@ -462,7 +496,15 @@ async function testAndSave(){
   }catch(err){
     pw.style.display='none'; btn.disabled=false;
     let msg=err.message;
-    if(/failed to fetch|networkerror|cors/i.test(msg)) msg='Cannot reach the sheet. Make sure you have published it via File → Share → Publish to web → CSV.';
+    if(msg==='403_FORBIDDEN'||/403/i.test(msg)){
+      msg='❌ HTTP 403 — Google is blocking access. Fix:\n\n'
+        +'1. In Google Sheets → click Share (top right) → "Anyone with the link" → Viewer → Done\n'
+        +'2. Then File → Share → Publish to web → Sheet1 → CSV → click Publish → OK\n'
+        +'3. Copy the NEW URL from that dialog (it contains /d/e/ and ends in output=csv)\n\n'
+        +'⚠️ If using a Jio/company Google account, try with a personal Gmail account instead.';
+    } else if(/failed to fetch|networkerror|timeout/i.test(msg)){
+      msg='Cannot connect. Check your internet and try again.';
+    }
     showErr('ue',msg);
   }
 }
