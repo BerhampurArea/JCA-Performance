@@ -1,1 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Performance — JCA Portal</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  JCA PORTAL — CONFIGURATION                                  ║
+  ║  Paste your Google Sheets CSV URL below (between the quotes) ║
+  ║  Get it from: Google Sheets → File → Share →                 ║
+  ║               Publish to web → Sheet1 → CSV → Publish        ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<script>
+  const SHEET_URL = "PASTE_YOUR_GOOGLE_SHEETS_CSV_URL_HERE";
+  // Example:
+  // const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR.../pub?gid=0&single=true&output=csv";
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f6fb;--surface:#fff;--surface2:#f0f2f5;--surface3:#e4e8ef;
+  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);
+  --text1:#0f1117;--text2:#5a6272;--text3:#9aa3b2;
+  --blue:#1a6ef7;--blue-dim:#eef3fe;--blue-t:#1652c4;
+  --green:#1a9b52;--green-dim:#eafaf0;--green-t:#147840;
+  --orange:#c96b0a;--orange-dim:#fff4e6;--orange-t:#a25508;
+  --red:#d93025;--red-dim:#fdf2f1;--red-t:#b72019;
+  --purple:#7c3aed;--purple-dim:#f3effe;--purple-t:#5b21b6;
+  --r:10px;--rl:14px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);
+  --sh-sm:0 1px 2px rgba(0,0,0,.05);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text1);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:56px;padding:0 20px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:var(--sh-sm)}
+.jio{background:var(--blue);color:#fff;font-weight:800;font-size:12px;padding:3px 10px;border-radius:5px;letter-spacing:.3px}
+.tb-title{font-size:15px;font-weight:700;color:var(--text1)}
+.tb-sub{font-size:11px;color:var(--text3);background:var(--surface2);border-radius:20px;padding:2px 9px;margin-left:4px}
+.tb-right{margin-left:auto}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:24px 14px 60px}
+
+/* SCREENS */
+.scr{display:none}.scr.active{display:block}
+
+/* LOOKUP */
+.lk-wrap{display:flex;flex-direction:column;align-items:center;padding-top:16px}
+.lk-card{background:var(--surface);border-radius:var(--rl);padding:36px 32px;max-width:420px;width:100%;box-shadow:var(--sh);text-align:center}
+.lk-icon{width:58px;height:58px;background:var(--blue-dim);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px}
+.lk-card h2{font-size:21px;font-weight:800;margin-bottom:7px;color:var(--text1)}
+.lk-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.prm-inp{width:100%;height:52px;border:2px solid var(--border2);border-radius:var(--r);padding:0 16px;font-size:20px;font-weight:800;font-family:var(--mono);color:var(--text1);background:var(--surface);outline:none;text-transform:uppercase;text-align:center;letter-spacing:2px;transition:border-color .15s;margin-bottom:10px}
+.prm-inp:focus{border-color:var(--blue)}
+.btn-look{width:100%;height:48px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;letter-spacing:.2px}
+.btn-look:hover{opacity:.88}
+.btn-look:disabled{opacity:.4;cursor:not-allowed}
+.err-msg{font-size:12px;color:var(--red);margin-bottom:10px;display:none;background:var(--red-dim);padding:8px 12px;border-radius:6px;text-align:left;line-height:1.5}
+.loading{font-size:13px;color:var(--text2);padding:8px 12px;display:none}
+.sheet-row{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.sheet-row p{font-size:11px;color:var(--text3);margin-bottom:6px}
+.sheet-row input{width:100%;height:34px;border:1px solid var(--border2);border-radius:7px;padding:0 10px;font-size:11px;font-family:var(--mono);color:var(--text1);background:var(--surface);outline:none}
+.sheet-row input:focus{border-color:var(--blue)}
+
+/* DASHBOARD */
+.dash-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:12px;flex-wrap:wrap}
+.jca-name{font-size:22px;font-weight:800;color:var(--text1)}
+.jca-meta{font-size:12px;color:var(--text2);margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
+.meta-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--text2)}
+.btn-back{height:34px;padding:0 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s;white-space:nowrap}
+.btn-back:hover{background:var(--surface2)}
+.upd-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);background:var(--surface2);border-radius:20px;padding:3px 10px;margin-bottom:20px}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;display:inline-block}
+
+/* LAP BADGE */
+.lap-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:700;margin-bottom:18px}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;margin-top:22px}
+
+/* ── HT+WB SECTION ── */
+.ht-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:6px}
+.kpi-card{background:var(--surface);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh-sm);border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-card.ht::before{background:var(--orange)}
+.kpi-card.sc::before{background:var(--blue)}
+.kpi-card.rr::before{background:var(--green)}
+.kpi-card.ov::before{background:var(--purple)}
+.kpi-card.accent-blue{background:var(--blue);border-color:var(--blue)}
+.kpi-card.accent-blue::before{display:none}
+.k-icon{font-size:16px;margin-bottom:6px}
+.k-lbl{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;line-height:1.3}
+.kpi-card.accent-blue .k-lbl{color:rgba(255,255,255,.75)}
+.k-val{font-size:22px;font-weight:800;line-height:1;color:var(--text1)}
+.kpi-card.accent-blue .k-val{color:#fff}
+.k-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.kpi-card.accent-blue .k-sub{color:rgba(255,255,255,.6)}
+/* progress bar inside card */
+.k-bar{height:4px;border-radius:2px;background:var(--surface3);margin-top:8px;overflow:hidden}
+.k-fill{height:100%;border-radius:2px;transition:width .5s}
+
+/* SECTION DIVIDER */
+.section-block{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);overflow:hidden;margin-bottom:14px;box-shadow:var(--sh-sm)}
+.section-block-head{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.sec-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sec-title{font-size:13px;font-weight:700;color:var(--text1)}
+.sec-title span{font-size:11px;font-weight:400;color:var(--text2);margin-left:6px}
+.section-block-body{padding:14px 16px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
+
+/* TABLE (for overall view) */
+.tw{border-radius:var(--r);overflow:hidden;overflow-x:auto;box-shadow:var(--sh-sm);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:400px}
+th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);padding:9px 13px;background:var(--surface2);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+td{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.2px}
+.t-ht{background:var(--orange-dim);color:var(--orange-t)}
+.t-sc{background:var(--blue-dim);color:var(--blue-t)}
+.t-rr{background:var(--green-dim);color:var(--green-t)}
+.pbar{display:inline-block;vertical-align:middle;width:48px;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-right:5px}
+.pfill{height:100%;border-radius:3px}
+
+/* CHART */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:18px 22px;box-shadow:var(--sh-sm);margin-top:14px}
+.chart-inner{position:relative;width:100%;height:240px}
+.chart-leg{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:12px;color:var(--text2)}
+.leg-i{display:flex;align-items:center;gap:5px}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-top:1px solid var(--border);margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="jio">JIO</span>
+  <span class="tb-title">My Performance</span>
+  <span class="tb-sub">JCA Portal</span>
+  <div class="tb-right" id="tb-right"></div>
+</div>
+
+<div class="main">
+
+  <!-- LOOKUP -->
+  <div id="scr-lookup" class="scr active">
+    <div class="lk-wrap">
+      <div class="lk-card">
+        <div class="lk-icon">📊</div>
+        <h2>View your performance</h2>
+        <p class="lk-desc">Enter your PRM ID to see your leads, calls, activations and recharges for the current Lap.</p>
+        <div class="err-msg" id="err-msg"></div>
+        <div class="loading" id="loading">⏳ Loading data…</div>
+        <input class="prm-inp" type="text" id="prm-inp" placeholder="PRM ID" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="btn-look" id="btn-look" onclick="lookup()">View my dashboard →</button>
+        <div class="sheet-row" id="sheet-row">
+          <p id="sheet-row-label">Sheet URL (auto-filled from link · or paste manually)</p>
+          <input type="text" id="sheet-inp" placeholder="Paste Google Sheets CSV URL here" spellcheck="false"
+            oninput="localStorage.setItem('jca_sheet_url', this.value.trim())">
+          <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="saveSheetUrl()" style="height:28px;padding:0 12px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">💾 Save URL</button>
+            <button onclick="clearSheetUrl()" style="height:28px;padding:0 12px;background:transparent;color:var(--text3);border:1px solid var(--border2);border-radius:6px;font-size:11px;cursor:pointer">Clear saved</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="scr-dash" class="scr">
+    <div class="dash-top">
+      <div>
+        <div class="jca-name" id="jca-name">—</div>
+        <div class="jca-meta" id="jca-meta"></div>
+      </div>
+      <button class="btn-back" onclick="goBack()">← Back</button>
+    </div>
+    <div class="upd-badge" id="upd-badge"><span class="dot-live"></span> Live data · Berhampur Area</div>
+    <div class="lap-badge" id="lap-badge">📅 LAP 1 · May 2026</div>
+
+    <!-- ── HT+WB ── -->
+    <div class="section-block">
+      <div class="section-block-head">
+        <span class="sec-dot" style="background:var(--orange)"></span>
+        <span class="sec-title">HT + WB Leads <span>Home Telephony + Wireless Broadband</span></span>
+      </div>
+      <div class="section-block-body">
+        <div class="kpi-row" id="ht-kpis"></div>
+      </div>
+    </div>
+
+    <!-- ── SC+ ── -->
+    <div class="section-block">
+      <div class="section-block-head">
+        <span class="sec-dot" style="background:var(--blue)"></span>
+        <span class="sec-title">SC+ Leads <span>SIM Card Plus</span></span>
+      </div>
+      <div class="section-block-body">
+        <div class="kpi-row" id="sc-kpis"></div>
+      </div>
+    </div>
+
+    <!-- ── RR ── -->
+    <div class="section-block">
+      <div class="section-block-head">
+        <span class="sec-dot" style="background:var(--green)"></span>
+        <span class="sec-title">RR Leads <span>Recharge Reminder</span></span>
+      </div>
+      <div class="section-block-body">
+        <div class="kpi-row" id="rr-kpis"></div>
+      </div>
+    </div>
+
+    <!-- ── OVERALL SUMMARY TABLE ── -->
+    <div class="sec-lbl" style="margin-top:24px">Overall summary</div>
+    <div class="tw">
+      <table>
+        <thead><tr>
+          <th>Lead type</th><th>Leads</th><th>Called / Contacted</th>
+          <th>Eff. Calls</th><th>Conversions</th><th>Conv %</th>
+        </tr></thead>
+        <tbody id="summary-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ── CHART ── -->
+    <div class="chart-card">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Lead vs Conversion — Visual</div>
+      <div class="chart-inner"><canvas id="kpiChart" role="img" aria-label="KPI comparison chart"></canvas></div>
+      <div class="chart-leg" id="chart-leg"></div>
+    </div>
+
+    <footer>Jio · JCA Performance Portal · Berhampur Area · LAP data · Internal use only</footer>
+  </div>
+
+</div>
+
+<script>
+let chartInst = null;
+
+/* ── COLUMN MAPPING for actual Excel headers ── */
+const COL = {
+  PRM_ID:        'JCA PRM ID',
+  Name:          'JCA Name',
+  JC_Code:       'JC Name',
+  JP_Code:       'JC / JP ID',
+  Area:          'Area',
+  Lap:           'Whitelisted in current lap',
+  // HT+WB
+  HT_Leads:      'HT+WB Leads ',
+  HT_EC:         'HT (H+WB) EC Calls',
+  HT_MNP:        'MTD MNP ORN (H+WB)',
+  HT_Act:        'Total Activation (H+WB)',
+  // SC+
+  SC_Leads:      'Total SC+ Leads ',
+  SC_Contact:    'Total SC+ Leads Contacted ',
+  SC_EC:         'Total SC+ -Effective Calls ',
+  SC_RC:         'Total SC+ RC Total ',
+  // RR
+  RR_Leads:      'RR MTD-Leads Assigned',
+  RR_Called:     'RR MTD - Called',
+  RR_EC:         'RR MTD-Effective Calls',
+  RR_RC:         'RR MTD Total Recharges',
+};
+
+function v(row, key) {
+  const col = COL[key];
+  if (!col) return 0;
+  // Try exact match first, then trimmed match
+  let val = row[col];
+  if (val === undefined) {
+    const trimmedKey = Object.keys(row).find(k => k.trim() === col.trim());
+    val = trimmedKey ? row[trimmedKey] : 0;
+  }
+  return isNaN(+val) ? (String(val||'').trim()) : (+val||0);
+}
+
+/* ── PROXY FETCH ── */
+async function fetchSheet(sheetUrl) {
+  const proxies = [
+    u => 'https://corsproxy.io/?' + encodeURIComponent(u),
+    u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+    u => 'https://thingproxy.freeboard.io/fetch/' + u,
+  ];
+  let text = '', lastErr = '';
+  for (const makeProxy of proxies) {
+    try {
+      const res = await fetch(makeProxy(sheetUrl), { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const t = await res.text();
+      if (t.includes('<!DOCTYPE') || t.includes('<html')) throw new Error('Got HTML');
+      text = t; break;
+    } catch(e) { lastErr = e.message; }
+  }
+  if (!text) throw new Error('Cannot load data. ' + (/403/.test(lastErr) ? 'Sheet may not be published publicly.' : 'Check your internet connection.'));
+  const rows = parseCSV(text);
+  if (rows.length < 2) throw new Error('Sheet is empty.');
+  const headers = rows[0];
+  // Find PRM ID column (flexible match)
+  const prmCol = headers.find(h => /jca.*prm|prm.*id/i.test(h.trim()));
+  if (!prmCol) throw new Error('PRM ID column not found. Make sure you uploaded the correct file.');
+  const records = rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (row[i] || '').trim(); });
+    return obj;
+  }).filter(r => {
+    const val = r[prmCol] || '';
+    return val && val !== '' && val !== '0';
+  });
+  return { records, prmCol };
+}
+
+function parseCSV(text) {
+  const rows = []; let cur = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      if (inQ && text[i+1] === '"') { field += '"'; i++; }
+      else inQ = !inQ;
+    } else if (c === ',' && !inQ) { cur.push(field.trim()); field = ''; }
+    else if ((c === '\n' || c === '\r') && !inQ) {
+      cur.push(field.trim()); field = '';
+      if (cur.some(v => v !== '')) rows.push(cur);
+      cur = [];
+      if (c === '\r' && text[i+1] === '\n') i++;
+    } else field += c;
+  }
+  if (field || cur.length) { cur.push(field.trim()); if (cur.some(v => v !== '')) rows.push(cur); }
+  return rows;
+}
+
+/* ── LOOKUP ── */
+window.addEventListener('load', function() {
+  // Priority: 1. Hardcoded SHEET_URL  2. ?sheet= param  3. localStorage  4. Manual input
+  const hardcoded = (typeof SHEET_URL !== 'undefined' && SHEET_URL && !SHEET_URL.includes('PASTE_YOUR')) ? SHEET_URL : '';
+  const param     = decodeURIComponent(new URLSearchParams(window.location.search).get('sheet') || '');
+  const saved     = localStorage.getItem('jca_sheet_url') || '';
+  const finalUrl  = hardcoded || param || saved;
+
+  if (finalUrl) {
+    document.getElementById('sheet-inp').value = finalUrl;
+    localStorage.setItem('jca_sheet_url', finalUrl);
+    // Hide the sheet input row if URL is hardcoded — JCAs don't need to see it
+    if (hardcoded) {
+      document.getElementById('sheet-row').style.display = 'none';
+    }
+  }
+});
+
+document.getElementById('prm-inp').addEventListener('keydown', e => { if (e.key === 'Enter') lookup(); });
+
+async function lookup() {
+  const prm = document.getElementById('prm-inp').value.trim().toUpperCase();
+  const sheetUrl = document.getElementById('sheet-inp').value.trim();
+  const errEl = document.getElementById('err-msg');
+  const loadEl = document.getElementById('loading');
+  const btn = document.getElementById('btn-look');
+  errEl.style.display = 'none';
+  if (!prm) { showError('Please enter your PRM ID.'); return; }
+  if (!sheetUrl) { showError('No data source. Please use the link shared by your admin.'); return; }
+  btn.disabled = true; loadEl.style.display = 'block';
+  try {
+    const { records, prmCol } = await fetchSheet(sheetUrl);
+    const row = records.find(r => String(r[prmCol] || '').trim().toUpperCase() === prm);
+    if (!row) throw new Error('PRM ID "' + prm + '" not found. Please check and try again.');
+    loadEl.style.display = 'none'; btn.disabled = false;
+    renderDash(row, prmCol);
+  } catch(err) {
+    loadEl.style.display = 'none'; btn.disabled = false;
+    let msg = err.message;
+    if (/failed to fetch|networkerror|timeout/i.test(msg)) msg = 'Cannot load data. Check your internet connection.';
+    showError(msg);
+  }
+}
+
+function showError(msg) { const el = document.getElementById('err-msg'); el.textContent = '⚠ ' + msg; el.style.display = 'block'; }
+
+/* ── RENDER DASHBOARD ── */
+function renderDash(row, prmCol) {
+  const prm = row[prmCol] || '';
+  const name = v(row,'Name') || prm;
+  const jc = v(row,'JC_Code') || '';
+  const jp = v(row,'JP_Code') || '';
+  const area = v(row,'Area') || 'Berhampur';
+
+  document.getElementById('jca-name').textContent = name;
+  document.getElementById('jca-meta').innerHTML = [
+    `<span class="meta-chip">🪪 ${prm}</span>`,
+    jc ? `<span class="meta-chip">🏪 ${jc}</span>` : '',
+    jp ? `<span class="meta-chip">🔑 JP: ${jp}</span>` : '',
+    `<span class="meta-chip">📍 ${area}</span>`,
+  ].join('');
+
+  // ── HT+WB KPIs ──
+  const htLeads = +v(row,'HT_Leads')||0;
+  const htEC    = +v(row,'HT_EC')||0;
+  const htMNP   = +v(row,'HT_MNP')||0;
+  const htAct   = +v(row,'HT_Act')||0;
+  const htConvPct = htLeads>0 ? Math.round(htAct/htLeads*100) : 0;
+  const htECPct   = htLeads>0 ? Math.round(htEC/htLeads*100) : 0;
+
+  document.getElementById('ht-kpis').innerHTML = [
+    kpiCard('ht','📋','HT+WB Leads','Allocated',htLeads,'',htLeads,htLeads,'#c96b0a'),
+    kpiCard('ht','📞','EC Calls (H+WB)','Effective calls <40s',htEC,'',htLeads,htEC,'#c96b0a'),
+    kpiCard('ht','📡','MNP ORN','MTD MNP activations',htMNP,'',htLeads,htMNP,'#c96b0a'),
+    kpiCard('ht accent-blue','✅','Total Activation','H+WB activations',htAct,htConvPct+'% conv',htLeads,htAct,'#fff',true),
+  ].join('');
+
+  // ── SC+ KPIs ──
+  const scLeads   = +v(row,'SC_Leads')||0;
+  const scContact = +v(row,'SC_Contact')||0;
+  const scEC      = +v(row,'SC_EC')||0;
+  const scRC      = +v(row,'SC_RC')||0;
+  const scConvPct = scLeads>0 ? Math.round(scRC/scLeads*100) : 0;
+  const scECPct   = scLeads>0 ? Math.round(scEC/scLeads*100) : 0;
+
+  document.getElementById('sc-kpis').innerHTML = [
+    kpiCard('sc','📋','SC+ Leads','Total allocated',scLeads,'',scLeads,scLeads,'#1a6ef7'),
+    kpiCard('sc','🤙','Leads Contacted','Called leads',scContact,'',scLeads,scContact,'#1a6ef7'),
+    kpiCard('sc','📞','Effective Calls','Valid calls <40s',scEC,scECPct+'%',scLeads,scEC,'#1a6ef7'),
+    kpiCard('sc accent-blue','💳','RC Total','SIM recharges',scRC,scConvPct+'% conv',scLeads,scRC,'#fff',true),
+  ].join('');
+
+  // ── RR KPIs ──
+  const rrLeads = +v(row,'RR_Leads')||0;
+  const rrCall  = +v(row,'RR_Called')||0;
+  const rrEC    = +v(row,'RR_EC')||0;
+  const rrRC    = +v(row,'RR_RC')||0;
+  const rrConvPct = rrLeads>0 ? Math.round(rrRC/rrLeads*100) : 0;
+  const rrECPct   = rrLeads>0 ? Math.round(rrEC/rrLeads*100) : 0;
+
+  document.getElementById('rr-kpis').innerHTML = [
+    kpiCard('rr','📋','RR Leads Assigned','Total allocated',rrLeads,'',rrLeads,rrLeads,'#1a9b52'),
+    kpiCard('rr','📲','MTD Called','Leads called',rrCall,'',rrLeads,rrCall,'#1a9b52'),
+    kpiCard('rr','📞','Effective Calls','Valid calls <40s',rrEC,rrECPct+'%',rrLeads,rrEC,'#1a9b52'),
+    kpiCard('rr accent-blue','🔄','Total Recharges','RR conversions',rrRC,rrConvPct+'% conv',rrLeads,rrRC,'#fff',true),
+  ].join('');
+
+  // ── SUMMARY TABLE ──
+  const tbody = document.getElementById('summary-tbody');
+  tbody.innerHTML = '';
+  [
+    { label:'HT + WB', cls:'t-ht', leads:htLeads, called:htEC, ec:htEC, conv:htAct,   color:'#c96b0a' },
+    { label:'SC+',     cls:'t-sc', leads:scLeads, called:scContact, ec:scEC, conv:scRC, color:'#1a6ef7' },
+    { label:'RR',      cls:'t-rr', leads:rrLeads, called:rrCall, ec:rrEC, conv:rrRC,   color:'#1a9b52' },
+  ].forEach(r => {
+    const p = r.leads>0 ? Math.round(r.conv/r.leads*100) : 0;
+    const bc = p>=60?'#1a9b52':p>=30?'#1a6ef7':'#c96b0a';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="tag ${r.cls}">${r.label}</span></td>
+      <td style="font-weight:600">${r.leads}</td>
+      <td>${r.called}</td>
+      <td>${r.ec}</td>
+      <td style="font-weight:700;color:${r.color}">${r.conv}</td>
+      <td><span class="pbar"><span class="pfill" style="width:${p}%;background:${bc}"></span></span>${p}%</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // ── CHART ──
+  const labels = ['HT+WB', 'SC+', 'RR'];
+  const leadsData  = [htLeads, scLeads, rrLeads];
+  const convData   = [htAct,   scRC,    rrRC];
+  const ecData     = [htEC,    scEC,    rrEC];
+  const colors     = ['#c96b0a','#1a6ef7','#1a9b52'];
+  const colorsDim  = ['rgba(201,107,10,.2)','rgba(26,110,247,.2)','rgba(26,155,82,.2)'];
+
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
+  chartInst = new Chart(document.getElementById('kpiChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Leads Allocated', data:leadsData, backgroundColor:colorsDim, borderColor:colors, borderWidth:1.5 },
+        { label:'Conversions',     data:convData,  backgroundColor:colors },
+        { label:'Effective Calls', data:ecData,    backgroundColor:colors.map(c=>c+'99') },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{mode:'index',intersect:false} },
+      scales:{
+        x:{ grid:{display:false} },
+        y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,.04)'}, ticks:{stepSize:50} }
+      }
+    }
+  });
+  document.getElementById('chart-leg').innerHTML = [
+    { c:'transparent', b:'#888', label:'Allocated' },
+    { c:'#c96b0a', b:null, label:'HT+WB Conv' },
+    { c:'#1a6ef7', b:null, label:'SC+ Conv' },
+    { c:'#1a9b52', b:null, label:'RR Conv' },
+  ].map(l=>`<span class="leg-i"><span class="leg-sq" style="background:${l.c};border:${l.b?'1.5px solid '+l.b:'none'}"></span>${l.label}</span>`).join('');
+
+  document.getElementById('scr-lookup').classList.remove('active');
+  document.getElementById('scr-dash').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── KPI CARD BUILDER ── */
+function kpiCard(cls, icon, label, sub, val, extra, total, current, color, isAccent) {
+  const pct = total > 0 ? Math.min(100, Math.round(current/total*100)) : 0;
+  const barBg = isAccent ? 'rgba(255,255,255,0.3)' : 'var(--surface3)';
+  const barFill = isAccent ? 'rgba(255,255,255,0.9)' : color;
+  return `<div class="kpi-card ${cls}">
+    <div class="k-icon">${icon}</div>
+    <div class="k-lbl">${label}</div>
+    <div class="k-val">${val}</div>
+    <div class="k-sub">${extra||sub}</div>
+    <div class="k-bar" style="background:${barBg}"><div class="k-fill" style="width:${pct}%;background:${barFill}"></div></div>
+  </div>`;
+}
+
+function saveSheetUrl(){
+  const url = document.getElementById('sheet-inp').value.trim();
+  if(!url){ alert('Please paste the Google Sheets CSV URL first.'); return; }
+  localStorage.setItem('jca_sheet_url', url);
+  const btn = event.target;
+  btn.textContent = '✅ Saved!';
+  btn.style.background = 'var(--green)';
+  setTimeout(()=>{ btn.textContent='💾 Save URL'; btn.style.background='var(--blue)'; }, 2000);
+}
+
+function clearSheetUrl(){
+  localStorage.removeItem('jca_sheet_url');
+  document.getElementById('sheet-inp').value = '';
+  document.getElementById('sheet-row-label').textContent = 'Sheet URL (paste manually)';
+}
+
+function goBack() {
+  document.getElementById('scr-dash').classList.remove('active');
+  document.getElementById('scr-lookup').classList.add('active');
+}
+</script>
+</body>
+</html>
