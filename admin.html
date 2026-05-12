@@ -1,1 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JCA Portal — Admin Upload</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--sf:#161b22;--sf2:#21262d;--sf3:#30363d;
+  --bd:#30363d;--bd2:#484f58;
+  --t1:#e6edf3;--t2:#8b949e;--t3:#484f58;
+  --blue:#2f81f7;--bdim:rgba(47,129,247,.15);
+  --green:#3fb950;--gdim:rgba(63,185,80,.15);
+  --red:#f85149;--rdim:rgba(248,81,73,.15);
+  --yellow:#e3b341;--ydim:rgba(227,179,65,.15);
+  --r:8px;--rl:12px;
+  --font:system-ui,-apple-system,sans-serif;
+  --mono:'Courier New',monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+/* HEADER */
+.hdr{background:var(--sf);border-bottom:1px solid var(--bd);height:58px;padding:0 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:99}
+.jio{background:var(--blue);color:#fff;font-weight:700;font-size:12px;padding:3px 10px;border-radius:5px;letter-spacing:.5px}
+.hdr-t{font-size:15px;font-weight:600}
+.hdr-s{font-size:11px;color:var(--t3);padding:2px 8px;background:var(--sf2);border:1px solid var(--bd);border-radius:20px}
+/* MAIN */
+.main{flex:1;max-width:700px;margin:0 auto;padding:32px 16px 60px;width:100%}
+/* STEP CARD */
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:14px;overflow:hidden;transition:border-color .2s}
+.sc.active{border-color:var(--blue)}
+.sc.done{border-color:var(--green)}
+.sc.warn{border-color:var(--yellow)}
+.sc-h{padding:16px 20px;display:flex;align-items:center;gap:12px}
+.sc-n{width:28px;height:28px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--t2);flex-shrink:0;transition:all .2s}
+.sc.active .sc-n{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+.sc.done .sc-n{background:var(--gdim);border-color:var(--green);color:var(--green)}
+.sc.warn .sc-n{background:var(--ydim);border-color:var(--yellow);color:var(--yellow)}
+.sc-i h3{font-size:13px;font-weight:600}
+.sc-i p{font-size:11px;color:var(--t2);margin-top:1px}
+.sc-b{padding:0 20px 20px;border-top:1px solid var(--bd)}
+/* LABELS */
+.fl{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:14px;display:block}
+/* UPLOAD ZONE */
+.uz{position:relative;border:2px dashed var(--bd2);border-radius:var(--r);padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:14px}
+.uz:hover{border-color:var(--blue);background:var(--bdim)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-icon{font-size:26px;margin-bottom:6px}
+.uz-t{font-size:13px;color:var(--t2);font-weight:500}
+.uz-h{font-size:11px;color:var(--t3);margin-top:3px}
+.uz.ok{border-color:var(--green);background:var(--gdim)}
+.uz.ok .uz-t{color:var(--green)}
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.chip{background:var(--sf3);border:1px solid var(--bd2);border-radius:4px;padding:2px 8px;font-size:11px;font-family:var(--mono);color:var(--t1)}
+/* TABLE */
+.tscr{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:400px}
+th{background:var(--sf2);padding:6px 10px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--t2);border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t1);font-family:var(--mono);white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+tr:last-child td{border-bottom:none}
+/* MAPPER */
+.mg{display:grid;grid-template-columns:1fr 22px 1fr;gap:7px 8px;align-items:center;margin-top:12px}
+.mt{font-size:11px;font-weight:600;font-family:var(--mono);background:var(--sf3);border-radius:4px;padding:5px 8px;color:var(--t1);word-break:break-all}
+.ma{text-align:center;color:var(--t3);font-size:13px}
+select{width:100%;height:34px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r);padding:0 8px;font-size:11px;font-family:var(--mono);color:var(--t1);outline:none;-webkit-appearance:none;appearance:none}
+select:focus{border-color:var(--blue)}
+/* STATS */
+.sp{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.spill{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px 11px;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:4px}
+.spill strong{color:var(--t1);font-weight:700}
+/* BTNS */
+.btn-p{height:42px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;width:100%;margin-top:14px;letter-spacing:.2px}
+.btn-p:hover{opacity:.85}
+.btn-p:disabled{opacity:.4;cursor:not-allowed}
+.btn-g{background:var(--green)}
+/* STEPS GUIDE */
+.guide{display:flex;flex-direction:column;gap:0;margin-top:14px}
+.gr{display:flex;gap:12px;align-items:flex-start;padding:10px 0;position:relative}
+.gr:not(:last-child)::after{content:'';position:absolute;left:13px;top:36px;bottom:0;width:1px;background:var(--bd)}
+.gi{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;position:relative;z-index:1;border:1px solid var(--bd)}
+.gi.b{background:var(--bdim);border-color:var(--blue)}
+.gi.g{background:var(--gdim);border-color:var(--green)}
+.gi.y{background:var(--ydim);border-color:var(--yellow)}
+.gi.p{background:rgba(163,113,247,.15);border-color:#a371f7}
+.gt{padding-top:3px}
+.gt strong{font-size:13px;font-weight:600;color:var(--t1);display:block}
+.gt span{font-size:12px;color:var(--t2);line-height:1.5;display:block;margin-top:2px}
+.gt code{font-family:var(--mono);font-size:10px;background:var(--sf3);padding:2px 5px;border-radius:3px;color:var(--t1);display:inline-block;margin-top:3px;word-break:break-all}
+/* PROGRESS */
+.pw{margin-top:14px;display:none}
+.pb{height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
+.pf{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;width:0%}
+.pt{font-size:12px;color:var(--t2);margin-top:6px}
+/* SUCCESS */
+.sbox{background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:16px 18px;margin-top:14px;display:none}
+.st{font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px}
+.surl{font-family:var(--mono);font-size:12px;color:var(--t1);background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;word-break:break-all;margin-bottom:8px;line-height:1.5}
+.sr{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.sbtn{height:32px;padding:0 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.sbtn-g{background:var(--green);color:#fff}
+.sbtn-d{background:var(--sf3);color:var(--t1)}
+.sinf{font-size:11px;color:var(--t2);line-height:1.7;margin-top:8px}
+/* ERROR */
+.err{background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--red);display:none;line-height:1.6;white-space:pre-wrap}
+/* INFO */
+.inf{background:var(--bdim);border:1px solid rgba(47,129,247,.3);border-radius:var(--r);padding:11px 14px;margin-top:12px;font-size:12px;color:var(--t2);line-height:1.7}
+.inf a{color:var(--blue);text-decoration:none}
+footer{text-align:center;font-size:11px;color:var(--t3);padding:20px;border-top:1px solid var(--bd)}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <span class="jio">JIO</span>
+  <span class="hdr-t">JCA Performance Portal</span>
+  <span class="hdr-s">Admin</span>
+</div>
+<div class="main">
 
+<!-- STEP 1: UPLOAD -->
+<div class="sc active" id="c1">
+  <div class="sc-h"><div class="sc-n" id="n1">1</div>
+    <div class="sc-i"><h3>Upload Excel / CSV file</h3><p>Any column names — you'll map them next</p></div>
+  </div>
+  <div class="sc-b">
+    <div class="uz" id="uz">
+      <input type="file" id="fi" accept=".xlsx,.xls,.csv">
+      <div class="uz-icon">📂</div>
+      <div class="uz-t" id="ul">Click to select Excel / CSV file</div>
+      <div class="uz-h">.xlsx · .xls · .csv — any size</div>
+    </div>
+    <div class="err" id="e1"></div>
+    <div id="raw-wrap" style="display:none">
+      <span class="fl">Columns found in your file</span>
+      <div class="chips" id="col-chips"></div>
+      <span class="fl">Preview (first 3 rows)</span>
+      <div class="tscr"><table id="raw-tbl"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2: MAP -->
+<div class="sc" id="c2" style="display:none">
+  <div class="sc-h"><div class="sc-n" id="n2">2</div>
+    <div class="sc-i"><h3>Map columns</h3><p>Match your file columns to portal fields — auto-matched where possible</p></div>
+  </div>
+  <div class="sc-b">
+    <div style="font-size:12px;color:var(--t2);margin-top:12px">Check the mapping below. Fix any wrong ones, then click Apply.</div>
+    <div class="mg" id="mg"></div>
+    <button class="btn-p" onclick="applyMap()">✅ Apply mapping →</button>
+    <div class="err" id="e2"></div>
+    <div id="mapped-wrap" style="display:none">
+      <div class="sp" id="sp"></div>
+      <span class="fl">Mapped preview (first 5 rows)</span>
+      <div class="tscr"><table id="map-tbl"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3: GOOGLE SHEETS -->
+<div class="sc" id="c3" style="display:none">
+  <div class="sc-h"><div class="sc-n" id="n3">3</div>
+    <div class="sc-i"><h3>Paste into Google Sheets</h3><p>Copy mapped data → paste in a new sheet → publish as CSV</p></div>
+  </div>
+  <div class="sc-b">
+    <div class="inf" style="margin-top:14px">📋 Click <strong>Copy mapped data</strong> below, then follow the 4 steps to publish on Google Sheets.</div>
+    <button class="btn-p btn-g" id="copy-btn" onclick="copyData()">📋 Copy mapped data to clipboard</button>
+    <div class="guide">
+      <div class="gr"><div class="gi b">1️⃣</div><div class="gt"><strong>Open Google Sheets</strong><span>Go to <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> → New spreadsheet<br>⚠️ Use <strong>personal Gmail</strong> — not Jio company email</span></div></div>
+      <div class="gr"><div class="gi g">2️⃣</div><div class="gt"><strong>Paste the data</strong><span>Click cell <strong>A1</strong> → press <strong>Ctrl+V</strong> to paste all rows</span></div></div>
+      <div class="gr"><div class="gi y">3️⃣</div><div class="gt"><strong>Publish as CSV</strong><span>File → Share → Publish to web<br>Left: <strong>Sheet1</strong> · Right: <strong>Comma-separated values (.csv)</strong><br>Click <strong>Publish</strong> → OK → copy the URL shown</span></div></div>
+      <div class="gr"><div class="gi p">4️⃣</div><div class="gt"><strong>Paste URL in Step 4 below</strong><span>URL must look like:</span><code>https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv</code></div></div>
+    </div>
+    <button class="btn-p" onclick="nextTo4()" style="margin-top:14px">I've published the sheet → Next →</button>
+  </div>
+</div>
+
+<!-- STEP 4: URL -->
+<div class="sc" id="c4" style="display:none">
+  <div class="sc-h"><div class="sc-n" id="n4">4</div>
+    <div class="sc-i"><h3>Enter Google Sheets CSV URL</h3><p>Paste the published CSV link to generate JCA link</p></div>
+  </div>
+  <div class="sc-b">
+    <span class="fl">Google Sheets CSV URL</span>
+    <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv"
+      style="width:100%;height:40px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r);padding:0 12px;font-size:12px;font-family:var(--mono);color:var(--t1);outline:none;margin-top:0" spellcheck="false">
+    <div style="font-size:11px;color:var(--t3);margin-top:5px">From Google Sheets → File → Share → Publish to web → CSV → copy URL</div>
+    <button class="btn-p" id="test-btn" onclick="testSheet()">🔗 Test connection &amp; generate JCA link</button>
+    <div class="pw" id="pw"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt" id="pt"></div></div>
+    <div class="err" id="e4"></div>
+    <div class="sbox" id="sbox">
+      <div class="st">✅ Connection verified! JCA link is ready.</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:6px">Share this link with all JCAs:</div>
+      <div class="surl" id="jca-url"></div>
+      <div class="sr">
+        <button class="sbtn sbtn-g" onclick="copyLink()">📋 Copy JCA link</button>
+        <button class="sbtn sbtn-d" onclick="window.open(document.getElementById('jca-url').textContent,'_blank')">🔗 Open JCA page</button>
+      </div>
+      <div class="sinf">
+        👤 JCA opens link → types PRM ID → sees their dashboard instantly.<br>
+        🔁 Daily update: paste new data into same Google Sheet (link never changes).<br>
+        📱 Works on mobile, tablet, and desktop.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+<footer>Jio · JCA Performance Portal · Admin Panel · Berhampur Area · Internal use only</footer>
+
+<script>
+// ── EXACT column names from JCA_Performance_LAP-1_May_2026.xlsx ──
+const FIELDS = [
+  {k:'JCA PRM ID',        req:true },
+  {k:'JCA Name',          req:true },
+  {k:'JC Name',           req:false},
+  {k:'JC / JP ID',        req:false},
+  {k:'Area',              req:false},
+  {k:'Whitelisted in current lap', req:false},
+  {k:'HT+WB Leads',       req:false},
+  {k:'HT (H+WB) EC Calls',req:false},
+  {k:'MTD MNP ORN (H+WB)',req:false},
+  {k:'Total Activation (H+WB)',req:false},
+  {k:'Total SC+ Leads',   req:false},
+  {k:'Total SC+ Leads Contacted', req:false},
+  {k:'Total SC+ -Effective Calls',req:false},
+  {k:'Total SC+ RC Total',req:false},
+  {k:'RR MTD-Leads Assigned',req:false},
+  {k:'RR MTD - Called',   req:false},
+  {k:'RR MTD-Effective Calls',req:false},
+  {k:'RR MTD Total Recharges',req:false},
+];
+
+const NUM_FIELDS = new Set([
+  'HT+WB Leads','HT (H+WB) EC Calls','MTD MNP ORN (H+WB)','Total Activation (H+WB)',
+  'Total SC+ Leads','Total SC+ Leads Contacted','Total SC+ -Effective Calls','Total SC+ RC Total',
+  'RR MTD-Leads Assigned','RR MTD - Called','RR MTD-Effective Calls','RR MTD Total Recharges'
+]);
+
+// ── AUTO-MATCH: normalize header and try to find best field ──
+function normalize(s){ return String(s||'').toLowerCase().replace(/[\s\-_\+\/\.\(\)]+/g,''); }
+
+function autoMatch(header){
+  const h = normalize(header);
+  for(const f of FIELDS){
+    // Direct exact match (after normalize)
+    if(normalize(f.k) === h) return f.k;
+  }
+  // Fuzzy contains match for key substrings
+  const fuzzy = [
+    {words:['jcaprmid','prmid','jcaid'],       field:'JCA PRM ID'},
+    {words:['jcaname'],                         field:'JCA Name'},
+    {words:['jcname','jcenternam'],             field:'JC Name'},
+    {words:['jcjpid','jpid'],                   field:'JC / JP ID'},
+    {words:['area'],                            field:'Area'},
+    {words:['whitelisted','currentlap'],        field:'Whitelisted in current lap'},
+    {words:['htwbleads','htwb'],                field:'HT+WB Leads'},
+    {words:['hteccall','hwbeccall','htwbec'],   field:'HT (H+WB) EC Calls'},
+    {words:['mtdmnp','mnporn'],                 field:'MTD MNP ORN (H+WB)'},
+    {words:['totalactivation','activationhwb'], field:'Total Activation (H+WB)'},
+    {words:['totalscleads','scleads'],          field:'Total SC+ Leads'},
+    {words:['scleadscontact','sccontact'],      field:'Total SC+ Leads Contacted'},
+    {words:['sceffective','sceffcall'],         field:'Total SC+ -Effective Calls'},
+    {words:['scrctotal','scrc'],                field:'Total SC+ RC Total'},
+    {words:['rrassigned','rrleads'],            field:'RR MTD-Leads Assigned'},
+    {words:['rrcalled','rrmtdcall'],            field:'RR MTD - Called'},
+    {words:['rreffective','rrec'],              field:'RR MTD-Effective Calls'},
+    {words:['rrrecharge','rrtotal'],            field:'RR MTD Total Recharges'},
+  ];
+  for(const {words, field} of fuzzy){
+    for(const w of words){ if(h.includes(w)) return field; }
+  }
+  return '';
+}
+
+// ── Safe ID for DOM elements ──
+function fid(k){ return 'sel_'+k.replace(/[^a-zA-Z0-9]/g,'_'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let rawData=[], fileHeaders=[], mappedData=[];
+
+// ── FILE UPLOAD ──
+document.getElementById('fi').addEventListener('change', function(e){
+  const file = e.target.files[0]; if(!file) return;
+  hideErr('e1');
+  document.getElementById('ul').textContent = '✅ ' + file.name;
+  document.getElementById('uz').classList.add('ok');
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const wb = XLSX.read(ev.target.result, {type:'binary', cellDates:true});
+
+      // Smart sheet picker: prefer Sheet1 with most rows; skip tiny sheets
+      let bestName = wb.SheetNames[0], bestCount = 0;
+      for(const name of wb.SheetNames){
+        const ws = wb.Sheets[name];
+        const data = XLSX.utils.sheet_to_json(ws, {defval:''});
+        if(name === 'Sheet1' && data.length > 2){ bestName = name; break; }
+        if(data.length > bestCount){ bestCount = data.length; bestName = name; }
+      }
+
+      const ws = wb.Sheets[bestName];
+      rawData = XLSX.utils.sheet_to_json(ws, {defval:''});
+      fileHeaders = rawData.length > 0 ? Object.keys(rawData[0]) : [];
+
+      if(!fileHeaders.length){
+        showErr('e1','File appears empty. Sheets found: '+wb.SheetNames.join(', ')+'. Make sure Sheet1 has data.');
+        return;
+      }
+
+      showRawPreview();
+      buildMapper();
+      document.getElementById('c2').style.display = 'block';
+      setDone('c1','n1');
+      setActive('c2');
+
+    } catch(err){
+      showErr('e1','Cannot read file: '+err.message);
+    }
+  };
+  reader.onerror = () => showErr('e1','File read failed. Try again.');
+  reader.readAsBinaryString(file);
+});
+
+function showRawPreview(){
+  document.getElementById('raw-wrap').style.display = 'block';
+  // Chips
+  document.getElementById('col-chips').innerHTML = fileHeaders.map(h=>`<span class="chip">${esc(h)}</span>`).join('');
+  // Table
+  const tbl = document.getElementById('raw-tbl'); tbl.innerHTML='';
+  const th = document.createElement('thead');
+  th.innerHTML = '<tr>'+fileHeaders.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr>';
+  tbl.appendChild(th);
+  const tb = document.createElement('tbody');
+  rawData.slice(0,3).forEach(row=>{
+    const tr = document.createElement('tr');
+    fileHeaders.forEach(h=>{ const td=document.createElement('td'); td.textContent=String(row[h]||'').substring(0,20); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+}
+
+// ── BUILD MAPPER ──
+function buildMapper(){
+  const grid = document.getElementById('mg'); grid.innerHTML='';
+  const opts = '<option value="">— skip —</option>' +
+    fileHeaders.map(h=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');
+
+  FIELDS.forEach(f=>{
+    // Auto-match: first try exact, then fuzzy
+    const exact = fileHeaders.find(h => h.trim() === f.k);
+    const fuzzy = exact || fileHeaders.find(h => autoMatch(h) === f.k) || '';
+
+    const lbl = document.createElement('div'); lbl.className='mt';
+    lbl.innerHTML = `${esc(f.k)}<span style="font-size:9px;color:${f.req?'#f85149':'var(--t3)'};margin-left:3px">${f.req?'*req':''}</span>`;
+
+    const arr = document.createElement('div'); arr.className='ma'; arr.textContent='←';
+
+    const sel = document.createElement('select'); sel.id = fid(f.k); sel.innerHTML = opts;
+    if(fuzzy) sel.value = fuzzy;
+
+    grid.appendChild(lbl); grid.appendChild(arr); grid.appendChild(sel);
+  });
+}
+
+// ── APPLY MAPPING ──
+function applyMap(){
+  hideErr('e2');
+  const map = {};
+  FIELDS.forEach(f=>{ const el=document.getElementById(fid(f.k)); map[f.k]=el?el.value:''; });
+
+  const missing = FIELDS.filter(f=>f.req && !map[f.k]).map(f=>f.k);
+  if(missing.length){ showErr('e2','Please map required fields: '+missing.join(', ')); return; }
+
+  mappedData = rawData.map(row=>{
+    const out={};
+    FIELDS.forEach(f=>{
+      const srcCol = map[f.k];
+      const val = srcCol ? row[srcCol] : '';
+      out[f.k] = NUM_FIELDS.has(f.k) ? (isNaN(+val)?0:+val) : String(val||'').trim();
+    });
+    return out;
+  }).filter(r => r['JCA PRM ID'] && r['JCA PRM ID'] !== '');
+
+  if(!mappedData.length){ showErr('e2','No valid rows found. Check JCA PRM ID mapping.'); return; }
+
+  showMappedPreview();
+  setDone('c2','n2');
+  document.getElementById('c3').style.display='block';
+  setActive('c3');
+}
+
+function showMappedPreview(){
+  document.getElementById('mapped-wrap').style.display='block';
+  const prms = [...new Set(mappedData.map(r=>r['JCA PRM ID']))];
+  const jcs  = [...new Set(mappedData.map(r=>r['JC Name']))].filter(Boolean);
+  document.getElementById('sp').innerHTML =
+    `<div class="spill">👤 <strong>${prms.length}</strong> JCAs</div>
+     <div class="spill">📋 <strong>${mappedData.length}</strong> rows</div>
+     <div class="spill">🏪 <strong>${jcs.length}</strong> JC(s)</div>`;
+  const cols = ['JCA PRM ID','JCA Name','JC Name','HT+WB Leads','Total SC+ Leads','RR MTD-Leads Assigned'];
+  const tbl = document.getElementById('map-tbl'); tbl.innerHTML='';
+  const th = document.createElement('thead');
+  th.innerHTML='<tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';
+  tbl.appendChild(th);
+  const tb = document.createElement('tbody');
+  mappedData.slice(0,5).forEach(row=>{
+    const tr=document.createElement('tr');
+    cols.forEach(c=>{ const td=document.createElement('td'); td.textContent=row[c]!==undefined?row[c]:'-'; tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+}
+
+// ── COPY DATA ──
+function copyData(){
+  const cols = FIELDS.map(f=>f.k);
+  const lines = [cols.join('\t')];
+  mappedData.forEach(row=>lines.push(cols.map(c=>row[c]!==undefined?row[c]:'').join('\t')));
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.textContent='✅ Copied! Now paste in Google Sheets (Ctrl+V)';
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    document.getElementById('copy-btn').textContent='✅ Copied!';
+  });
+}
+
+function nextTo4(){
+  setDone('c3','n3');
+  document.getElementById('c4').style.display='block';
+  setActive('c4');
+}
+
+// ── TEST GOOGLE SHEET ──
+async function testSheet(){
+  const url = document.getElementById('sheet-url').value.trim();
+  hideErr('e4');
+  document.getElementById('sbox').style.display='none';
+  if(!url){ showErr('e4','Please paste the Google Sheets CSV URL.'); return; }
+  if(!url.includes('docs.google.com')){ showErr('e4','URL must be from Google Sheets. Example:\nhttps://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv'); return; }
+  if(!url.includes('/d/e/')){ showErr('e4','This looks like the edit URL, not the published URL.\nThe correct URL contains "/d/e/" and comes from:\nFile → Share → Publish to web → CSV → copy that URL.'); return; }
+  if(!url.includes('output=csv')){ showErr('e4','URL must end with output=csv.\nIn Google Sheets: File → Share → Publish to web → select CSV format.'); return; }
+
+  const btn=document.getElementById('test-btn'); btn.disabled=true;
+  const pw=document.getElementById('pw'),pf=document.getElementById('pf'),pt=document.getElementById('pt');
+  pw.style.display='block'; pf.style.width='15%'; pt.textContent='Connecting…';
+
+  const proxies = [
+    u => 'https://corsproxy.io/?'+encodeURIComponent(u),
+    u => 'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+    u => 'https://thingproxy.freeboard.io/fetch/'+u,
+  ];
+  let text='', lastErr='';
+  for(const makeP of proxies){
+    try{
+      pf.style.width='40%'; pt.textContent='Trying to reach sheet…';
+      const res = await fetch(makeP(url), {signal:AbortSignal.timeout(8000)});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const t = await res.text();
+      if(t.includes('<!DOCTYPE')||t.includes('<html')) throw new Error('Got HTML not CSV');
+      text=t; break;
+    } catch(e){ lastErr=e.message; }
+  }
+
+  if(!text){
+    pw.style.display='none'; btn.disabled=false;
+    let msg = lastErr.includes('403')
+      ? '❌ HTTP 403 — Google is blocking access.\n\nFix:\n1. In Google Sheets → Share (top right) → "Anyone with the link" → Viewer → Done\n2. File → Share → Publish to web → Sheet1 → CSV → Publish → OK\n3. Copy that new URL\n\n⚠️ If using Jio/company Google account, use personal Gmail instead.'
+      : 'Cannot connect to sheet. Check your internet and try again.\nError: '+lastErr;
+    showErr('e4', msg); return;
+  }
+
+  pf.style.width='80%'; pt.textContent='Validating data…';
+  const lines = text.split('\n').filter(l=>l.trim());
+  if(lines.length<2){ pw.style.display='none'; btn.disabled=false; showErr('e4','Sheet appears empty. Make sure you pasted the mapped data correctly.'); return; }
+  const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+  if(!headers.includes('JCA PRM ID')){ pw.style.display='none'; btn.disabled=false; showErr('e4','Column "JCA PRM ID" not found in sheet.\nMake sure you copied the mapped data from Step 3 (not the raw Excel).'); return; }
+
+  pf.style.width='100%'; pt.textContent='✅ Connected! '+(lines.length-1)+' JCA rows found.';
+  setTimeout(()=>pw.style.display='none', 1500);
+
+  const base = window.location.href.replace(/[?#].*$/).replace(/admin\.html$/, 'index.html');
+  const link = base + '?sheet=' + encodeURIComponent(url);
+  document.getElementById('jca-url').textContent = link;
+  document.getElementById('sbox').style.display='block';
+  setDone('c4','n4'); btn.disabled=false;
+}
+
+function copyLink(){
+  const url = document.getElementById('jca-url').textContent;
+  navigator.clipboard.writeText(url).then(()=>{
+    const b=document.querySelectorAll('.sbtn')[0];
+    b.textContent='✅ Copied!';
+    setTimeout(()=>b.textContent='📋 Copy JCA link',2000);
+  }).catch(()=>{ const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta); });
+}
+
+// ── HELPERS ──
+function showErr(id, msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+function hideErr(id){ document.getElementById(id).style.display='none'; }
+function setDone(cid,nid){ const c=document.getElementById(cid); c.classList.remove('active','warn'); c.classList.add('done'); document.getElementById(nid).textContent='✓'; }
+function setActive(id){ document.getElementById(id).classList.add('active'); }
+</script>
+</body>
+</html>
