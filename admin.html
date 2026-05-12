@@ -3,542 +3,508 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JCA Portal — Admin Setup</title>
+<title>JCA Portal — Admin Upload</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--surface3:#30363d;
-  --border:#30363d;--border2:#484f58;
-  --text1:#e6edf3;--text2:#8b949e;--text3:#484f58;
-  --blue:#2f81f7;--blue-dim:rgba(47,129,247,.15);
-  --green:#3fb950;--green-dim:rgba(63,185,80,.15);
-  --orange:#d29922;--orange-dim:rgba(210,153,34,.15);
-  --red:#f85149;--red-dim:rgba(248,81,73,.15);
-  --yellow:#e3b341;--yellow-dim:rgba(227,179,65,.15);
-  --purple:#a371f7;--purple-dim:rgba(163,113,247,.15);
-  --r:8px;--rl:12px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --bg:#0d1117;--sf:#161b22;--sf2:#21262d;--sf3:#30363d;
+  --bd:#30363d;--bd2:#484f58;
+  --t1:#e6edf3;--t2:#8b949e;--t3:#484f58;
+  --blue:#2f81f7;--bdim:rgba(47,129,247,.15);
+  --green:#3fb950;--gdim:rgba(63,185,80,.15);
+  --red:#f85149;--rdim:rgba(248,81,73,.15);
+  --yellow:#e3b341;--ydim:rgba(227,179,65,.15);
+  --r:8px;--rl:12px;
+  --font:system-ui,-apple-system,sans-serif;
+  --mono:'Courier New',monospace;
 }
-body{font-family:var(--font);background:var(--bg);color:var(--text1);min-height:100vh;display:flex;flex-direction:column}
-.hdr{background:var(--surface);border-bottom:1px solid var(--border);height:58px;padding:0 28px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:99}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;display:flex;flex-direction:column}
+/* HEADER */
+.hdr{background:var(--sf);border-bottom:1px solid var(--bd);height:58px;padding:0 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:99}
 .jio{background:var(--blue);color:#fff;font-weight:700;font-size:12px;padding:3px 10px;border-radius:5px;letter-spacing:.5px}
 .hdr-t{font-size:15px;font-weight:600}
-.hdr-s{font-size:11px;color:var(--text3);padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
-.main{flex:1;max-width:720px;margin:0 auto;padding:36px 16px 60px;width:100%}
+.hdr-s{font-size:11px;color:var(--t3);padding:2px 8px;background:var(--sf2);border:1px solid var(--bd);border-radius:20px}
+/* MAIN */
+.main{flex:1;max-width:700px;margin:0 auto;padding:32px 16px 60px;width:100%}
 /* STEP CARD */
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:14px;overflow:hidden;transition:border-color .2s}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:14px;overflow:hidden;transition:border-color .2s}
 .sc.active{border-color:var(--blue)}
 .sc.done{border-color:var(--green)}
 .sc.warn{border-color:var(--yellow)}
-.sc-head{padding:16px 22px;display:flex;align-items:center;gap:12px}
-.sc-num{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;transition:all .2s}
-.sc.active .sc-num{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
-.sc.done .sc-num{background:var(--green-dim);border-color:var(--green);color:var(--green)}
-.sc.warn .sc-num{background:var(--yellow-dim);border-color:var(--yellow);color:var(--yellow)}
-.sc-info h3{font-size:13px;font-weight:600}
-.sc-info p{font-size:11px;color:var(--text2);margin-top:1px}
-.sc-body{padding:0 22px 22px;border-top:1px solid var(--border)}
-/* INPUTS */
-.fg{margin-top:14px}
-.fl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
-input[type=text],input[type=url],select{width:100%;height:40px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:0 12px;font-size:13px;font-family:var(--mono);color:var(--text1);outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
-input:focus,select:focus{border-color:var(--blue)}
-textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:12px;font-family:var(--mono);color:var(--text1);outline:none;resize:vertical;transition:border-color .15s;min-height:60px}
-textarea:focus{border-color:var(--blue)}
-select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
-select option{background:#21262d}
-.hint{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5}
-.hint a,.link{color:var(--blue);text-decoration:none}
-.hint a:hover,.link:hover{text-decoration:underline}
-/* STEPS VISUAL */
-.steps-visual{display:flex;flex-direction:column;gap:0;margin-top:14px}
-.sv-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;position:relative}
-.sv-row:not(:last-child)::after{content:'';position:absolute;left:14px;top:38px;bottom:0;width:1px;background:var(--border)}
-.sv-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;position:relative;z-index:1}
-.sv-icon.blue{background:var(--blue-dim);border:1px solid var(--blue)}
-.sv-icon.green{background:var(--green-dim);border:1px solid var(--green)}
-.sv-icon.orange{background:var(--orange-dim);border:1px solid var(--orange)}
-.sv-icon.purple{background:var(--purple-dim);border:1px solid var(--purple)}
-.sv-text{padding-top:4px}
-.sv-text strong{font-size:13px;font-weight:600;color:var(--text1);display:block}
-.sv-text span{font-size:12px;color:var(--text2);line-height:1.5;display:block;margin-top:2px}
+.sc-h{padding:16px 20px;display:flex;align-items:center;gap:12px}
+.sc-n{width:28px;height:28px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--t2);flex-shrink:0;transition:all .2s}
+.sc.active .sc-n{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+.sc.done .sc-n{background:var(--gdim);border-color:var(--green);color:var(--green)}
+.sc.warn .sc-n{background:var(--ydim);border-color:var(--yellow);color:var(--yellow)}
+.sc-i h3{font-size:13px;font-weight:600}
+.sc-i p{font-size:11px;color:var(--t2);margin-top:1px}
+.sc-b{padding:0 20px 20px;border-top:1px solid var(--bd)}
+/* LABELS */
+.fl{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:14px;display:block}
 /* UPLOAD ZONE */
-.uz{position:relative;border:2px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:14px}
-.uz:hover{border-color:var(--blue);background:var(--blue-dim)}
+.uz{position:relative;border:2px dashed var(--bd2);border-radius:var(--r);padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;margin-top:14px}
+.uz:hover{border-color:var(--blue);background:var(--bdim)}
 .uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .uz-icon{font-size:26px;margin-bottom:6px}
-.uz-t{font-size:13px;color:var(--text2);font-weight:500}
-.uz-h{font-size:11px;color:var(--text3);margin-top:3px}
-.uz.has-file{border-color:var(--green);background:var(--green-dim)}
-.uz.has-file .uz-t{color:var(--green)}
+.uz-t{font-size:13px;color:var(--t2);font-weight:500}
+.uz-h{font-size:11px;color:var(--t3);margin-top:3px}
+.uz.ok{border-color:var(--green);background:var(--gdim)}
+.uz.ok .uz-t{color:var(--green)}
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
+.chip{background:var(--sf3);border:1px solid var(--bd2);border-radius:4px;padding:2px 8px;font-size:11px;font-family:var(--mono);color:var(--t1)}
 /* TABLE */
-.tscroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
-th{background:var(--surface2);padding:7px 11px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:7px 11px;border-bottom:1px solid var(--border);color:var(--text1);font-family:var(--mono);font-size:11px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.tscr{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:400px}
+th{background:var(--sf2);padding:6px 10px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--t2);border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--bd);color:var(--t1);font-family:var(--mono);white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
 tr:last-child td{border-bottom:none}
-.chip{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:4px;padding:2px 8px;font-size:11px;font-family:var(--mono);color:var(--text1);margin:2px}
-.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
-.b-sc{background:var(--blue-dim);color:var(--blue)}
-.b-rr{background:var(--green-dim);color:var(--green)}
-.b-ht{background:var(--orange-dim);color:var(--orange)}
 /* MAPPER */
-.mg{display:grid;grid-template-columns:1fr 22px 1fr;gap:7px 8px;align-items:center}
-.mt{font-size:12px;font-weight:600;font-family:var(--mono);background:var(--surface3);border-radius:5px;padding:6px 10px;color:var(--text1)}
-.ma{text-align:center;color:var(--text3);font-size:14px}
+.mg{display:grid;grid-template-columns:1fr 22px 1fr;gap:7px 8px;align-items:center;margin-top:12px}
+.mt{font-size:11px;font-weight:600;font-family:var(--mono);background:var(--sf3);border-radius:4px;padding:5px 8px;color:var(--t1);word-break:break-all}
+.ma{text-align:center;color:var(--t3);font-size:13px}
+select{width:100%;height:34px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r);padding:0 8px;font-size:11px;font-family:var(--mono);color:var(--t1);outline:none;-webkit-appearance:none;appearance:none}
+select:focus{border-color:var(--blue)}
 /* STATS */
-.sp{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.spill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
-.spill strong{color:var(--text1);font-weight:700}
-/* BUTTONS */
-.btn-p{height:44px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;width:100%;margin-top:14px;letter-spacing:.2px}
-.btn-p:hover{opacity:.88}
+.sp{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.spill{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px 11px;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:4px}
+.spill strong{color:var(--t1);font-weight:700}
+/* BTNS */
+.btn-p{height:42px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:opacity .15s;width:100%;margin-top:14px;letter-spacing:.2px}
+.btn-p:hover{opacity:.85}
 .btn-p:disabled{opacity:.4;cursor:not-allowed}
-.btn-s{height:36px;padding:0 14px;background:var(--surface2);color:var(--text1);border:1px solid var(--border2);border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s}
-.btn-s:hover{background:var(--surface3)}
+.btn-g{background:var(--green)}
+/* STEPS GUIDE */
+.guide{display:flex;flex-direction:column;gap:0;margin-top:14px}
+.gr{display:flex;gap:12px;align-items:flex-start;padding:10px 0;position:relative}
+.gr:not(:last-child)::after{content:'';position:absolute;left:13px;top:36px;bottom:0;width:1px;background:var(--bd)}
+.gi{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;position:relative;z-index:1;border:1px solid var(--bd)}
+.gi.b{background:var(--bdim);border-color:var(--blue)}
+.gi.g{background:var(--gdim);border-color:var(--green)}
+.gi.y{background:var(--ydim);border-color:var(--yellow)}
+.gi.p{background:rgba(163,113,247,.15);border-color:#a371f7}
+.gt{padding-top:3px}
+.gt strong{font-size:13px;font-weight:600;color:var(--t1);display:block}
+.gt span{font-size:12px;color:var(--t2);line-height:1.5;display:block;margin-top:2px}
+.gt code{font-family:var(--mono);font-size:10px;background:var(--sf3);padding:2px 5px;border-radius:3px;color:var(--t1);display:inline-block;margin-top:3px;word-break:break-all}
 /* PROGRESS */
 .pw{margin-top:14px;display:none}
-.pb{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden}
+.pb{height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
 .pf{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;width:0%}
-.pt{font-size:12px;color:var(--text2);margin-top:6px}
+.pt{font-size:12px;color:var(--t2);margin-top:6px}
 /* SUCCESS */
-.sbox{background:var(--green-dim);border:1px solid var(--green);border-radius:var(--r);padding:16px 18px;margin-top:14px;display:none}
-.s-t{font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px}
-.s-url{font-family:var(--mono);font-size:12px;color:var(--text1);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;word-break:break-all;margin-bottom:8px;line-height:1.5}
-.s-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.sbox{background:var(--gdim);border:1px solid var(--green);border-radius:var(--r);padding:16px 18px;margin-top:14px;display:none}
+.st{font-size:14px;font-weight:700;color:var(--green);margin-bottom:8px}
+.surl{font-family:var(--mono);font-size:12px;color:var(--t1);background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;word-break:break-all;margin-bottom:8px;line-height:1.5}
+.sr{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .sbtn{height:32px;padding:0 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
 .sbtn-g{background:var(--green);color:#fff}
-.sbtn-d{background:var(--surface3);color:var(--text1)}
-.s-inf{font-size:11px;color:var(--text2);line-height:1.7;margin-top:8px}
-/* ERROR / INFO */
-.ebox{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--red);display:none;line-height:1.6}
-.ibox{background:var(--blue-dim);border:1px solid rgba(47,129,247,.3);border-radius:var(--r);padding:12px 14px;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.7}
-/* SHEET GUIDE BOX */
-.guide-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-top:14px}
-.guide-box code{font-family:var(--mono);font-size:11px;background:var(--surface3);padding:2px 6px;border-radius:3px;color:var(--text1);display:inline-block;margin-top:3px;word-break:break-all}
-footer{text-align:center;font-size:11px;color:var(--text3);padding:20px;border-top:1px solid var(--border)}
+.sbtn-d{background:var(--sf3);color:var(--t1)}
+.sinf{font-size:11px;color:var(--t2);line-height:1.7;margin-top:8px}
+/* ERROR */
+.err{background:var(--rdim);border:1px solid var(--red);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--red);display:none;line-height:1.6;white-space:pre-wrap}
+/* INFO */
+.inf{background:var(--bdim);border:1px solid rgba(47,129,247,.3);border-radius:var(--r);padding:11px 14px;margin-top:12px;font-size:12px;color:var(--t2);line-height:1.7}
+.inf a{color:var(--blue);text-decoration:none}
+footer{text-align:center;font-size:11px;color:var(--t3);padding:20px;border-top:1px solid var(--bd)}
 </style>
 </head>
 <body>
-
 <div class="hdr">
   <span class="jio">JIO</span>
   <span class="hdr-t">JCA Performance Portal</span>
   <span class="hdr-s">Admin</span>
 </div>
-
 <div class="main">
 
-<!-- ── STEP 1: Upload Excel ─────────────────────────────────────────── -->
+<!-- STEP 1: UPLOAD -->
 <div class="sc active" id="c1">
-  <div class="sc-head">
-    <div class="sc-num" id="n1">1</div>
-    <div class="sc-info"><h3>Upload your Excel / CSV file</h3><p>Any column names — you'll map them next</p></div>
+  <div class="sc-h"><div class="sc-n" id="n1">1</div>
+    <div class="sc-i"><h3>Upload Excel / CSV file</h3><p>Any column names — you'll map them next</p></div>
   </div>
-  <div class="sc-body">
+  <div class="sc-b">
     <div class="uz" id="uz">
       <input type="file" id="fi" accept=".xlsx,.xls,.csv">
       <div class="uz-icon">📂</div>
-      <div class="uz-t" id="ul">Click to select Excel / CSV</div>
+      <div class="uz-t" id="ul">Click to select Excel / CSV file</div>
       <div class="uz-h">.xlsx · .xls · .csv — any size</div>
     </div>
-    <div class="ebox" id="pe"></div>
+    <div class="err" id="e1"></div>
     <div id="raw-wrap" style="display:none">
-      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:14px;margin-bottom:6px">Columns in your file</div>
-      <div id="col-chips"></div>
-      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:12px;margin-bottom:6px">Preview (first 3 rows)</div>
-      <div class="tscroll"><table id="rt"></table></div>
+      <span class="fl">Columns found in your file</span>
+      <div class="chips" id="col-chips"></div>
+      <span class="fl">Preview (first 3 rows)</span>
+      <div class="tscr"><table id="raw-tbl"></table></div>
     </div>
   </div>
 </div>
 
-<!-- ── STEP 2: Map Columns ──────────────────────────────────────────── -->
+<!-- STEP 2: MAP -->
 <div class="sc" id="c2" style="display:none">
-  <div class="sc-head">
-    <div class="sc-num" id="n2">2</div>
-    <div class="sc-info"><h3>Map columns</h3><p>Match your file columns to portal fields</p></div>
+  <div class="sc-h"><div class="sc-n" id="n2">2</div>
+    <div class="sc-i"><h3>Map columns</h3><p>Match your file columns to portal fields — auto-matched where possible</p></div>
   </div>
-  <div class="sc-body">
-    <div style="font-size:12px;color:var(--text2);margin-top:14px;margin-bottom:12px">Auto-matched where possible. Correct any mismatches, then click Apply.</div>
+  <div class="sc-b">
+    <div style="font-size:12px;color:var(--t2);margin-top:12px">Check the mapping below. Fix any wrong ones, then click Apply.</div>
     <div class="mg" id="mg"></div>
     <button class="btn-p" onclick="applyMap()">✅ Apply mapping →</button>
-    <div class="ebox" id="me"></div>
-    <div id="mp" style="display:none">
-      <div class="sp" id="sp" style="margin-top:14px"></div>
-      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Mapped preview (first 5 rows)</div>
-      <div class="tscroll"><table id="mt"></table></div>
+    <div class="err" id="e2"></div>
+    <div id="mapped-wrap" style="display:none">
+      <div class="sp" id="sp"></div>
+      <span class="fl">Mapped preview (first 5 rows)</span>
+      <div class="tscr"><table id="map-tbl"></table></div>
     </div>
   </div>
 </div>
 
-<!-- ── STEP 3: Paste to Google Sheets ──────────────────────────────── -->
+<!-- STEP 3: GOOGLE SHEETS -->
 <div class="sc" id="c3" style="display:none">
-  <div class="sc-head">
-    <div class="sc-num" id="n3">3</div>
-    <div class="sc-info"><h3>Paste data into Google Sheets</h3><p>Copy the mapped data → paste in a new sheet</p></div>
+  <div class="sc-h"><div class="sc-n" id="n3">3</div>
+    <div class="sc-i"><h3>Paste into Google Sheets</h3><p>Copy mapped data → paste in a new sheet → publish as CSV</p></div>
   </div>
-  <div class="sc-body">
-
-    <div class="ibox" style="margin-top:14px">
-      📋 Click <strong>"Copy mapped data"</strong> below, then follow the 3 steps to publish on Google Sheets.
+  <div class="sc-b">
+    <div class="inf" style="margin-top:14px">📋 Click <strong>Copy mapped data</strong> below, then follow the 4 steps to publish on Google Sheets.</div>
+    <button class="btn-p btn-g" id="copy-btn" onclick="copyData()">📋 Copy mapped data to clipboard</button>
+    <div class="guide">
+      <div class="gr"><div class="gi b">1️⃣</div><div class="gt"><strong>Open Google Sheets</strong><span>Go to <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> → New spreadsheet<br>⚠️ Use <strong>personal Gmail</strong> — not Jio company email</span></div></div>
+      <div class="gr"><div class="gi g">2️⃣</div><div class="gt"><strong>Paste the data</strong><span>Click cell <strong>A1</strong> → press <strong>Ctrl+V</strong> to paste all rows</span></div></div>
+      <div class="gr"><div class="gi y">3️⃣</div><div class="gt"><strong>Publish as CSV</strong><span>File → Share → Publish to web<br>Left: <strong>Sheet1</strong> · Right: <strong>Comma-separated values (.csv)</strong><br>Click <strong>Publish</strong> → OK → copy the URL shown</span></div></div>
+      <div class="gr"><div class="gi p">4️⃣</div><div class="gt"><strong>Paste URL in Step 4 below</strong><span>URL must look like:</span><code>https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv</code></div></div>
     </div>
-
-    <button class="btn-p" id="copy-btn" onclick="copyMappedData()" style="background:var(--green)">📋 Copy mapped data to clipboard</button>
-
-    <div class="steps-visual" style="margin-top:16px">
-      <div class="sv-row">
-        <div class="sv-icon blue">1️⃣</div>
-        <div class="sv-text">
-          <strong>Open Google Sheets</strong>
-          <span>Go to <a href="https://sheets.google.com" target="_blank" class="link">sheets.google.com</a> → create a <strong>New spreadsheet</strong></span>
-        </div>
-      </div>
-      <div class="sv-row">
-        <div class="sv-icon green">2️⃣</div>
-        <div class="sv-text">
-          <strong>Paste the data</strong>
-          <span>Click cell <strong>A1</strong> → press <strong>Ctrl+V</strong> (or Cmd+V on Mac) to paste all rows</span>
-        </div>
-      </div>
-      <div class="sv-row">
-        <div class="sv-icon orange">3️⃣</div>
-        <div class="sv-text">
-          <strong>Publish as CSV</strong>
-          <span>Go to <strong>File → Share → Publish to web</strong><br>
-          Select: <strong>Sheet1</strong> · Format: <strong>Comma-separated values (.csv)</strong><br>
-          Click <strong>Publish</strong> → copy the URL shown</span>
-        </div>
-      </div>
-      <div class="sv-row">
-        <div class="sv-icon purple">4️⃣</div>
-        <div class="sv-text">
-          <strong>Paste the URL below in Step 4</strong>
-          <span>The URL looks like:<br>
-          <code style="font-family:var(--mono);font-size:10px;background:var(--surface3);padding:2px 5px;border-radius:3px;word-break:break-all">https://docs.google.com/spreadsheets/d/…/pub?gid=0&single=true&output=csv</code></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="ebox" id="ce"></div>
-    <div class="guide-box" style="margin-top:6px">
-      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">💡 For <strong>daily updates</strong>: just paste new data into the same sheet and re-publish (or it auto-refreshes if already published). The JCA link never changes.</div>
-    </div>
-
-    <button class="btn-p" onclick="nextStep3()" style="margin-top:14px">I've published the sheet → Next →</button>
+    <button class="btn-p" onclick="nextTo4()" style="margin-top:14px">I've published the sheet → Next →</button>
   </div>
 </div>
 
-<!-- ── STEP 4: Enter Sheet URL ──────────────────────────────────────── -->
+<!-- STEP 4: URL -->
 <div class="sc" id="c4" style="display:none">
-  <div class="sc-head">
-    <div class="sc-num" id="n4">4</div>
-    <div class="sc-info"><h3>Enter Google Sheets CSV URL</h3><p>Paste the published CSV link here</p></div>
+  <div class="sc-h"><div class="sc-n" id="n4">4</div>
+    <div class="sc-i"><h3>Enter Google Sheets CSV URL</h3><p>Paste the published CSV link to generate JCA link</p></div>
   </div>
-  <div class="sc-body">
-    <div class="fg">
-      <label class="fl">Google Sheets CSV URL</label>
-      <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv" spellcheck="false">
-      <div class="hint">From Google Sheets → File → Share → Publish to web → CSV → copy the URL</div>
-    </div>
-    <button class="btn-p" id="test-btn" onclick="testAndSave()">🔗 Test connection & generate JCA link</button>
+  <div class="sc-b">
+    <span class="fl">Google Sheets CSV URL</span>
+    <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv"
+      style="width:100%;height:40px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r);padding:0 12px;font-size:12px;font-family:var(--mono);color:var(--t1);outline:none;margin-top:0" spellcheck="false">
+    <div style="font-size:11px;color:var(--t3);margin-top:5px">From Google Sheets → File → Share → Publish to web → CSV → copy URL</div>
+    <button class="btn-p" id="test-btn" onclick="testSheet()">🔗 Test connection &amp; generate JCA link</button>
     <div class="pw" id="pw"><div class="pb"><div class="pf" id="pf"></div></div><div class="pt" id="pt"></div></div>
-    <div class="ebox" id="ue"></div>
-    <div class="sbox" id="sb">
-      <div class="s-t">✅ Connection verified! JCA link is ready.</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Share this link with all JCAs — works from any device:</div>
-      <div class="s-url" id="jca-url"></div>
-      <div class="s-row">
-        <button class="sbtn sbtn-g" onclick="copyJCALink()">📋 Copy JCA link</button>
-        <button class="sbtn sbtn-d" onclick="openJCALink()">🔗 Open JCA page</button>
+    <div class="err" id="e4"></div>
+    <div class="sbox" id="sbox">
+      <div class="st">✅ Connection verified! JCA link is ready.</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:6px">Share this link with all JCAs:</div>
+      <div class="surl" id="jca-url"></div>
+      <div class="sr">
+        <button class="sbtn sbtn-g" onclick="copyLink()">📋 Copy JCA link</button>
+        <button class="sbtn sbtn-d" onclick="window.open(document.getElementById('jca-url').textContent,'_blank')">🔗 Open JCA page</button>
       </div>
-      <div class="s-inf">
+      <div class="sinf">
         👤 JCA opens link → types PRM ID → sees their dashboard instantly.<br>
-        🔁 <strong>Daily update:</strong> Paste new data into the same Google Sheet (no need to change the JCA link).<br>
+        🔁 Daily update: paste new data into same Google Sheet (link never changes).<br>
         📱 Works on mobile, tablet, and desktop.
       </div>
     </div>
   </div>
 </div>
 
-</div>
-<footer>Jio · JCA Performance Portal · Admin Panel · Internal use only</footer>
+</div><!-- /main -->
+<footer>Jio · JCA Performance Portal · Admin Panel · Berhampur Area · Internal use only</footer>
 
 <script>
-let rawData=[], fileHeaders=[], mappedData=[], generatedLink='';
-
-// Actual Excel columns from JCA_Performance file
-const FIELDS=[
-  {k:'JCA PRM ID',req:true},{k:'JCA Name',req:true},{k:'JC Name',req:false},
-  {k:'JC / JP ID',req:false},{k:'Area',req:false},
-  {k:'HT+WB Leads ',req:false},{k:'HT (H+WB) EC Calls',req:false},
-  {k:'MTD MNP ORN (H+WB)',req:false},{k:'Total Activation (H+WB)',req:false},
-  {k:'Total SC+ Leads ',req:false},{k:'Total SC+ Leads Contacted ',req:false},
-  {k:'Total SC+ -Effective Calls ',req:false},{k:'Total SC+ RC Total ',req:false},
-  {k:'RR MTD-Leads Assigned',req:false},{k:'RR MTD - Called',req:false},
-  {k:'RR MTD-Effective Calls',req:false},{k:'RR MTD Total Recharges',req:false}
+// ── EXACT column names from JCA_Performance_LAP-1_May_2026.xlsx ──
+const FIELDS = [
+  {k:'JCA PRM ID',        req:true },
+  {k:'JCA Name',          req:true },
+  {k:'JC Name',           req:false},
+  {k:'JC / JP ID',        req:false},
+  {k:'Area',              req:false},
+  {k:'Whitelisted in current lap', req:false},
+  {k:'HT+WB Leads',       req:false},
+  {k:'HT (H+WB) EC Calls',req:false},
+  {k:'MTD MNP ORN (H+WB)',req:false},
+  {k:'Total Activation (H+WB)',req:false},
+  {k:'Total SC+ Leads',   req:false},
+  {k:'Total SC+ Leads Contacted', req:false},
+  {k:'Total SC+ -Effective Calls',req:false},
+  {k:'Total SC+ RC Total',req:false},
+  {k:'RR MTD-Leads Assigned',req:false},
+  {k:'RR MTD - Called',   req:false},
+  {k:'RR MTD-Effective Calls',req:false},
+  {k:'RR MTD Total Recharges',req:false},
 ];
-const NUMS=['HT+WB Leads ','HT (H+WB) EC Calls','MTD MNP ORN (H+WB)','Total Activation (H+WB)',
-  'Total SC+ Leads ','Total SC+ Leads Contacted ','Total SC+ -Effective Calls ','Total SC+ RC Total ',
-  'RR MTD-Leads Assigned','RR MTD - Called','RR MTD-Effective Calls','RR MTD Total Recharges'];
-// bestMatch does direct name matching since columns are well-defined
-function bestMatch(h){
-  // Normalize both sides and do fuzzy match
-  const n=h.toLowerCase().replace(/[\s\-_\+\.]+/g,'');
-  const fieldNorms={
-    'jcaprmid':'JCA PRM ID','jcaname':'JCA Name','jcname':'JC Name',
-    'jcjpid':'JC / JP ID','area':'Area',
-    'htwbleads':'HT+WB Leads ','hth+wbeccalls':'HT (H+WB) EC Calls',
-    'mtdmnpornh+wb':'MTD MNP ORN (H+WB)','totalactivationh+wb':'Total Activation (H+WB)',
-    'totalsclead':'Total SC+ Leads ','totalscleadscontacted':'Total SC+ Leads Contacted ',
-    'totalsceffectivecalls':'Total SC+ -Effective Calls ','totalscrctotal':'Total SC+ RC Total ',
-    'rrleadsassigned':'RR MTD-Leads Assigned','rrmtdcalled':'RR MTD - Called',
-    'rreffectivecalls':'RR MTD-Effective Calls','rrtotalrecharges':'RR MTD Total Recharges'
-  };
-  for(const[nk,field] of Object.entries(fieldNorms)){
-    if(n.includes(nk.replace(/[\s\-_\+\.]+/g,'').toLowerCase())) return field;
-  }
-  return '';
-}
-function bestMatch(h){
-  const n=h.toLowerCase().replace(/[\s\-_\.]+/g,'');
-  for(const[f,vs] of Object.entries(HINTS)){
-    for(const v of vs){ if(n===v.replace(/[\s\-_\.]+/g,'')) return f; }
-  }
-  return '';
-}
-function esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-/* ── FILE UPLOAD ── */
-document.getElementById('fi').addEventListener('change',function(e){
-  const file=e.target.files[0]; if(!file) return;
-  document.getElementById('ul').textContent='✅ '+file.name;
-  document.getElementById('uz').classList.add('has-file');
-  document.getElementById('pe').style.display='none';
-  const reader=new FileReader();
-  reader.onload=function(ev){
+const NUM_FIELDS = new Set([
+  'HT+WB Leads','HT (H+WB) EC Calls','MTD MNP ORN (H+WB)','Total Activation (H+WB)',
+  'Total SC+ Leads','Total SC+ Leads Contacted','Total SC+ -Effective Calls','Total SC+ RC Total',
+  'RR MTD-Leads Assigned','RR MTD - Called','RR MTD-Effective Calls','RR MTD Total Recharges'
+]);
+
+// ── AUTO-MATCH: normalize header and try to find best field ──
+function normalize(s){ return String(s||'').toLowerCase().replace(/[\s\-_\+\/\.\(\)]+/g,''); }
+
+function autoMatch(header){
+  const h = normalize(header);
+  for(const f of FIELDS){
+    // Direct exact match (after normalize)
+    if(normalize(f.k) === h) return f.k;
+  }
+  // Fuzzy contains match for key substrings
+  const fuzzy = [
+    {words:['jcaprmid','prmid','jcaid'],       field:'JCA PRM ID'},
+    {words:['jcaname'],                         field:'JCA Name'},
+    {words:['jcname','jcenternam'],             field:'JC Name'},
+    {words:['jcjpid','jpid'],                   field:'JC / JP ID'},
+    {words:['area'],                            field:'Area'},
+    {words:['whitelisted','currentlap'],        field:'Whitelisted in current lap'},
+    {words:['htwbleads','htwb'],                field:'HT+WB Leads'},
+    {words:['hteccall','hwbeccall','htwbec'],   field:'HT (H+WB) EC Calls'},
+    {words:['mtdmnp','mnporn'],                 field:'MTD MNP ORN (H+WB)'},
+    {words:['totalactivation','activationhwb'], field:'Total Activation (H+WB)'},
+    {words:['totalscleads','scleads'],          field:'Total SC+ Leads'},
+    {words:['scleadscontact','sccontact'],      field:'Total SC+ Leads Contacted'},
+    {words:['sceffective','sceffcall'],         field:'Total SC+ -Effective Calls'},
+    {words:['scrctotal','scrc'],                field:'Total SC+ RC Total'},
+    {words:['rrassigned','rrleads'],            field:'RR MTD-Leads Assigned'},
+    {words:['rrcalled','rrmtdcall'],            field:'RR MTD - Called'},
+    {words:['rreffective','rrec'],              field:'RR MTD-Effective Calls'},
+    {words:['rrrecharge','rrtotal'],            field:'RR MTD Total Recharges'},
+  ];
+  for(const {words, field} of fuzzy){
+    for(const w of words){ if(h.includes(w)) return field; }
+  }
+  return '';
+}
+
+// ── Safe ID for DOM elements ──
+function fid(k){ return 'sel_'+k.replace(/[^a-zA-Z0-9]/g,'_'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let rawData=[], fileHeaders=[], mappedData=[];
+
+// ── FILE UPLOAD ──
+document.getElementById('fi').addEventListener('change', function(e){
+  const file = e.target.files[0]; if(!file) return;
+  hideErr('e1');
+  document.getElementById('ul').textContent = '✅ ' + file.name;
+  document.getElementById('uz').classList.add('ok');
+  const reader = new FileReader();
+  reader.onload = function(ev){
     try{
-      const wb=XLSX.read(ev.target.result,{type:'binary',cellDates:true});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      rawData=XLSX.utils.sheet_to_json(ws,{defval:''});
-      fileHeaders=rawData.length>0?Object.keys(rawData[0]):[];
-      if(!fileHeaders.length){showErr('pe','File appears empty or has no header row.');return;}
-      renderRaw();
-      renderMapper();
-      done('c1','n1');
-      show('c2'); active('c2');
-    }catch(err){showErr('pe','Cannot read file: '+err.message);}
+      const wb = XLSX.read(ev.target.result, {type:'binary', cellDates:true});
+
+      // Smart sheet picker: prefer Sheet1 with most rows; skip tiny sheets
+      let bestName = wb.SheetNames[0], bestCount = 0;
+      for(const name of wb.SheetNames){
+        const ws = wb.Sheets[name];
+        const data = XLSX.utils.sheet_to_json(ws, {defval:''});
+        if(name === 'Sheet1' && data.length > 2){ bestName = name; break; }
+        if(data.length > bestCount){ bestCount = data.length; bestName = name; }
+      }
+
+      const ws = wb.Sheets[bestName];
+      rawData = XLSX.utils.sheet_to_json(ws, {defval:''});
+      fileHeaders = rawData.length > 0 ? Object.keys(rawData[0]) : [];
+
+      if(!fileHeaders.length){
+        showErr('e1','File appears empty. Sheets found: '+wb.SheetNames.join(', ')+'. Make sure Sheet1 has data.');
+        return;
+      }
+
+      showRawPreview();
+      buildMapper();
+      document.getElementById('c2').style.display = 'block';
+      setDone('c1','n1');
+      setActive('c2');
+
+    } catch(err){
+      showErr('e1','Cannot read file: '+err.message);
+    }
   };
-  reader.onerror=()=>showErr('pe','File read failed.');
+  reader.onerror = () => showErr('e1','File read failed. Try again.');
   reader.readAsBinaryString(file);
 });
 
-function renderRaw(){
-  document.getElementById('raw-wrap').style.display='block';
-  document.getElementById('col-chips').innerHTML=fileHeaders.map(h=>`<span class="chip">${esc(h)}</span>`).join('');
-  const tbl=document.getElementById('rt'); tbl.innerHTML='';
-  const th=document.createElement('thead');
-  th.innerHTML='<tr>'+fileHeaders.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr>';
+function showRawPreview(){
+  document.getElementById('raw-wrap').style.display = 'block';
+  // Chips
+  document.getElementById('col-chips').innerHTML = fileHeaders.map(h=>`<span class="chip">${esc(h)}</span>`).join('');
+  // Table
+  const tbl = document.getElementById('raw-tbl'); tbl.innerHTML='';
+  const th = document.createElement('thead');
+  th.innerHTML = '<tr>'+fileHeaders.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr>';
   tbl.appendChild(th);
-  const tb=document.createElement('tbody');
+  const tb = document.createElement('tbody');
   rawData.slice(0,3).forEach(row=>{
-    const tr=document.createElement('tr');
-    fileHeaders.forEach(h=>{const td=document.createElement('td');td.textContent=String(row[h]||'').substring(0,25);tr.appendChild(td);});
+    const tr = document.createElement('tr');
+    fileHeaders.forEach(h=>{ const td=document.createElement('td'); td.textContent=String(row[h]||'').substring(0,20); tr.appendChild(td); });
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
 }
 
-function renderMapper(){
-  const grid=document.getElementById('mg'); grid.innerHTML='';
-  const opts='<option value="">— skip —</option>'+fileHeaders.map(h=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');
+// ── BUILD MAPPER ──
+function buildMapper(){
+  const grid = document.getElementById('mg'); grid.innerHTML='';
+  const opts = '<option value="">— skip —</option>' +
+    fileHeaders.map(h=>`<option value="${esc(h)}">${esc(h)}</option>`).join('');
+
   FIELDS.forEach(f=>{
-    const auto=fileHeaders.find(h=>bestMatch(h)===f.k)||'';
-    const lbl=document.createElement('div'); lbl.className='mt';
-    lbl.innerHTML=`${f.k} <span style="font-size:10px;color:${f.req?'var(--red)':'var(--text3)'};font-weight:400">${f.req?'*req':'opt'}</span>`;
-    const arr=document.createElement('div'); arr.className='ma'; arr.textContent='←';
-    const sel=document.createElement('select'); sel.id='m_'+f.k; sel.innerHTML=opts;
-    if(auto) sel.value=auto;
+    // Auto-match: first try exact, then fuzzy
+    const exact = fileHeaders.find(h => h.trim() === f.k);
+    const fuzzy = exact || fileHeaders.find(h => autoMatch(h) === f.k) || '';
+
+    const lbl = document.createElement('div'); lbl.className='mt';
+    lbl.innerHTML = `${esc(f.k)}<span style="font-size:9px;color:${f.req?'#f85149':'var(--t3)'};margin-left:3px">${f.req?'*req':''}</span>`;
+
+    const arr = document.createElement('div'); arr.className='ma'; arr.textContent='←';
+
+    const sel = document.createElement('select'); sel.id = fid(f.k); sel.innerHTML = opts;
+    if(fuzzy) sel.value = fuzzy;
+
     grid.appendChild(lbl); grid.appendChild(arr); grid.appendChild(sel);
   });
 }
 
-/* ── APPLY MAP ── */
+// ── APPLY MAPPING ──
 function applyMap(){
-  document.getElementById('me').style.display='none';
-  const map={};
-  FIELDS.forEach(f=>{const el=document.getElementById('m_'+f.k);map[f.k]=el?el.value:'';});
-  const miss=FIELDS.filter(f=>f.req&&!map[f.k]).map(f=>f.k);
-  if(miss.length){showErr('me','Map these required fields: '+miss.join(', '));return;}
-  mappedData=rawData.map(row=>{
+  hideErr('e2');
+  const map = {};
+  FIELDS.forEach(f=>{ const el=document.getElementById(fid(f.k)); map[f.k]=el?el.value:''; });
+
+  const missing = FIELDS.filter(f=>f.req && !map[f.k]).map(f=>f.k);
+  if(missing.length){ showErr('e2','Please map required fields: '+missing.join(', ')); return; }
+
+  mappedData = rawData.map(row=>{
     const out={};
     FIELDS.forEach(f=>{
-      const v=map[f.k]?row[map[f.k]]:'';
-      out[f.k]=NUMS.includes(f.k)?(isNaN(+v)?0:+v):String(v||'').trim();
+      const srcCol = map[f.k];
+      const val = srcCol ? row[srcCol] : '';
+      out[f.k] = NUM_FIELDS.has(f.k) ? (isNaN(+val)?0:+val) : String(val||'').trim();
     });
     return out;
-  }).filter(r=>r.PRM_ID);
-  if(!mappedData.length){showErr('me','No valid rows. Check PRM_ID mapping.');return;}
-  renderMapped();
-  done('c2','n2');
-  show('c3'); active('c3');
+  }).filter(r => r['JCA PRM ID'] && r['JCA PRM ID'] !== '');
+
+  if(!mappedData.length){ showErr('e2','No valid rows found. Check JCA PRM ID mapping.'); return; }
+
+  showMappedPreview();
+  setDone('c2','n2');
+  document.getElementById('c3').style.display='block';
+  setActive('c3');
 }
 
-function renderMapped(){
-  document.getElementById('mp').style.display='block';
-  const prms=[...new Set(mappedData.map(r=>r.PRM_ID))];
-  const laps=[...new Set(mappedData.map(r=>r.Lap))];
-  const types=[...new Set(mappedData.map(r=>r.Lead_Type))].filter(Boolean);
-  document.getElementById('sp').innerHTML=
+function showMappedPreview(){
+  document.getElementById('mapped-wrap').style.display='block';
+  const prms = [...new Set(mappedData.map(r=>r['JCA PRM ID']))];
+  const jcs  = [...new Set(mappedData.map(r=>r['JC Name']))].filter(Boolean);
+  document.getElementById('sp').innerHTML =
     `<div class="spill">👤 <strong>${prms.length}</strong> JCAs</div>
      <div class="spill">📋 <strong>${mappedData.length}</strong> rows</div>
-     <div class="spill">🔄 <strong>${laps.length}</strong> Lap(s)</div>
-     <div class="spill">🏷 <strong>${types.join(' · ')||'—'}</strong></div>`;
-  const cols=FIELDS.map(f=>f.k);
-  const tbl=document.getElementById('mt'); tbl.innerHTML='';
-  const th=document.createElement('thead');
-  th.innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+     <div class="spill">🏪 <strong>${jcs.length}</strong> JC(s)</div>`;
+  const cols = ['JCA PRM ID','JCA Name','JC Name','HT+WB Leads','Total SC+ Leads','RR MTD-Leads Assigned'];
+  const tbl = document.getElementById('map-tbl'); tbl.innerHTML='';
+  const th = document.createElement('thead');
+  th.innerHTML='<tr>'+cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>';
   tbl.appendChild(th);
-  const tb=document.createElement('tbody');
+  const tb = document.createElement('tbody');
   mappedData.slice(0,5).forEach(row=>{
     const tr=document.createElement('tr');
-    cols.forEach(c=>{
-      const td=document.createElement('td');
-      if(c==='Lead_Type'){const lt=(row[c]||'').toUpperCase();const cl=lt==='SC+'?'b-sc':lt==='RR'?'b-rr':'b-ht';td.innerHTML=`<span class="badge ${cl}">${row[c]||'-'}</span>`;}
-      else td.textContent=row[c]!==undefined?row[c]:'-';
-      tr.appendChild(td);
-    });
+    cols.forEach(c=>{ const td=document.createElement('td'); td.textContent=row[c]!==undefined?row[c]:'-'; tr.appendChild(td); });
     tb.appendChild(tr);
   });
   tbl.appendChild(tb);
 }
 
-/* ── COPY DATA ── */
-function copyMappedData(){
-  const cols=FIELDS.map(f=>f.k);
-  const lines=[cols.join('\t')];
+// ── COPY DATA ──
+function copyData(){
+  const cols = FIELDS.map(f=>f.k);
+  const lines = [cols.join('\t')];
   mappedData.forEach(row=>lines.push(cols.map(c=>row[c]!==undefined?row[c]:'').join('\t')));
-  const text=lines.join('\n');
+  const text = lines.join('\n');
   navigator.clipboard.writeText(text).then(()=>{
     const b=document.getElementById('copy-btn');
     b.textContent='✅ Copied! Now paste in Google Sheets (Ctrl+V)';
-    b.style.background='var(--green)';
   }).catch(()=>{
     const ta=document.createElement('textarea');
-    ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');
-    document.body.removeChild(ta);
-    const b=document.getElementById('copy-btn');
-    b.textContent='✅ Copied!';
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    document.getElementById('copy-btn').textContent='✅ Copied!';
   });
 }
 
-function nextStep3(){
-  done('c3','n3');
-  show('c4'); active('c4');
+function nextTo4(){
+  setDone('c3','n3');
+  document.getElementById('c4').style.display='block';
+  setActive('c4');
 }
 
-/* ── TEST GOOGLE SHEET ── */
-async function fetchViaProxy(url){
-  // Try multiple CORS proxies in sequence
-  const proxies=[
-    u=>'https://corsproxy.io/?'+encodeURIComponent(u),
-    u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
-    u=>'https://thingproxy.freeboard.io/fetch/'+u,
-  ];
-  let lastErr='';
-  for(const makeProxy of proxies){
-    try{
-      const res=await fetch(makeProxy(url),{signal:AbortSignal.timeout(8000)});
-      if(res.status===403) throw new Error('HTTP_403');
-      if(!res.ok) throw new Error('HTTP_'+res.status);
-      const text=await res.text();
-      if(text.includes('<!DOCTYPE')||text.includes('<html')) throw new Error('Got HTML instead of CSV — sheet may not be published.');
-      return text;
-    }catch(e){ lastErr=e.message; }
-  }
-  // All proxies failed — give specific help
-  if(lastErr.includes('403')||lastErr.includes('HTTP_403')){
-    throw new Error('403_FORBIDDEN');
-  }
-  throw new Error(lastErr);
-}
-
-async function testAndSave(){
-  const url=document.getElementById('sheet-url').value.trim();
-  document.getElementById('ue').style.display='none';
-  document.getElementById('sb').style.display='none';
-  if(!url){showErr('ue','Please paste the Google Sheets CSV URL.');return;}
-  if(!url.includes('docs.google.com')){showErr('ue','URL must be a Google Sheets publish link. It should contain "pub?". Example: https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv');return;}
-  if(!url.includes('output=csv')){showErr('ue','URL must end with output=csv. In Google Sheets go to File → Share → Publish to web → select CSV format → Publish.');return;}
-  if(!url.includes('/d/e/')){showErr('ue','This looks like an edit URL, not a published URL. The published URL contains "/d/e/". Go to File → Share → Publish to web → CSV → copy that URL.');return;}
+// ── TEST GOOGLE SHEET ──
+async function testSheet(){
+  const url = document.getElementById('sheet-url').value.trim();
+  hideErr('e4');
+  document.getElementById('sbox').style.display='none';
+  if(!url){ showErr('e4','Please paste the Google Sheets CSV URL.'); return; }
+  if(!url.includes('docs.google.com')){ showErr('e4','URL must be from Google Sheets. Example:\nhttps://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv'); return; }
+  if(!url.includes('/d/e/')){ showErr('e4','This looks like the edit URL, not the published URL.\nThe correct URL contains "/d/e/" and comes from:\nFile → Share → Publish to web → CSV → copy that URL.'); return; }
+  if(!url.includes('output=csv')){ showErr('e4','URL must end with output=csv.\nIn Google Sheets: File → Share → Publish to web → select CSV format.'); return; }
 
   const btn=document.getElementById('test-btn'); btn.disabled=true;
   const pw=document.getElementById('pw'),pf=document.getElementById('pf'),pt=document.getElementById('pt');
-  pw.style.display='block'; pf.style.width='20%'; pt.textContent='Testing connection…';
+  pw.style.display='block'; pf.style.width='15%'; pt.textContent='Connecting…';
 
-  try{
-    pf.style.width='55%'; pt.textContent='Trying to reach Google Sheet…';
-    const text=await fetchViaProxy(url);
-    pf.style.width='85%'; pt.textContent='Validating data…';
-    const lines=text.split('\n').filter(l=>l.trim());
-    if(lines.length<2) throw new Error('Sheet appears empty. Make sure you pasted the mapped data and it has at least one data row.');
-    const headers=parseCSVLine(lines[0]);
-    if(!headers.includes('PRM_ID')) throw new Error('Column "PRM_ID" not found in the sheet. Make sure you used the Admin page to copy the correctly mapped data.');
-    pf.style.width='100%'; pt.textContent='✅ Connected! '+(lines.length-1)+' rows found.';
-    localStorage.setItem('jca_sheet_url',url);
-    const base=window.location.href.replace(/[?#].*$/).replace(/admin\.html$/,'index.html');
-    generatedLink=base+'?sheet='+encodeURIComponent(url);
-    document.getElementById('jca-url').textContent=generatedLink;
-    document.getElementById('sb').style.display='block';
-    done('c4','n4');
-    setTimeout(()=>{pw.style.display='none';},1500);
-  }catch(err){
+  const proxies = [
+    u => 'https://corsproxy.io/?'+encodeURIComponent(u),
+    u => 'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+    u => 'https://thingproxy.freeboard.io/fetch/'+u,
+  ];
+  let text='', lastErr='';
+  for(const makeP of proxies){
+    try{
+      pf.style.width='40%'; pt.textContent='Trying to reach sheet…';
+      const res = await fetch(makeP(url), {signal:AbortSignal.timeout(8000)});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const t = await res.text();
+      if(t.includes('<!DOCTYPE')||t.includes('<html')) throw new Error('Got HTML not CSV');
+      text=t; break;
+    } catch(e){ lastErr=e.message; }
+  }
+
+  if(!text){
     pw.style.display='none'; btn.disabled=false;
-    let msg=err.message;
-    if(msg==='403_FORBIDDEN'||/403/i.test(msg)){
-      msg='❌ HTTP 403 — Google is blocking access. Fix:\n\n'
-        +'1. In Google Sheets → click Share (top right) → "Anyone with the link" → Viewer → Done\n'
-        +'2. Then File → Share → Publish to web → Sheet1 → CSV → click Publish → OK\n'
-        +'3. Copy the NEW URL from that dialog (it contains /d/e/ and ends in output=csv)\n\n'
-        +'⚠️ If using a Jio/company Google account, try with a personal Gmail account instead.';
-    } else if(/failed to fetch|networkerror|timeout/i.test(msg)){
-      msg='Cannot connect. Check your internet and try again.';
-    }
-    showErr('ue',msg);
+    let msg = lastErr.includes('403')
+      ? '❌ HTTP 403 — Google is blocking access.\n\nFix:\n1. In Google Sheets → Share (top right) → "Anyone with the link" → Viewer → Done\n2. File → Share → Publish to web → Sheet1 → CSV → Publish → OK\n3. Copy that new URL\n\n⚠️ If using Jio/company Google account, use personal Gmail instead.'
+      : 'Cannot connect to sheet. Check your internet and try again.\nError: '+lastErr;
+    showErr('e4', msg); return;
   }
+
+  pf.style.width='80%'; pt.textContent='Validating data…';
+  const lines = text.split('\n').filter(l=>l.trim());
+  if(lines.length<2){ pw.style.display='none'; btn.disabled=false; showErr('e4','Sheet appears empty. Make sure you pasted the mapped data correctly.'); return; }
+  const headers = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+  if(!headers.includes('JCA PRM ID')){ pw.style.display='none'; btn.disabled=false; showErr('e4','Column "JCA PRM ID" not found in sheet.\nMake sure you copied the mapped data from Step 3 (not the raw Excel).'); return; }
+
+  pf.style.width='100%'; pt.textContent='✅ Connected! '+(lines.length-1)+' JCA rows found.';
+  setTimeout(()=>pw.style.display='none', 1500);
+
+  const base = window.location.href.replace(/[?#].*$/).replace(/admin\.html$/, 'index.html');
+  const link = base + '?sheet=' + encodeURIComponent(url);
+  document.getElementById('jca-url').textContent = link;
+  document.getElementById('sbox').style.display='block';
+  setDone('c4','n4'); btn.disabled=false;
 }
 
-function parseCSVLine(line){
-  const result=[]; let cur='',inQ=false;
-  for(let i=0;i<line.length;i++){
-    if(line[i]==='"'){inQ=!inQ;}
-    else if(line[i]===','&&!inQ){result.push(cur.trim());cur='';}
-    else cur+=line[i];
-  }
-  result.push(cur.trim());
-  return result;
-}
-
-function copyJCALink(){
-  navigator.clipboard.writeText(generatedLink).then(()=>{
+function copyLink(){
+  const url = document.getElementById('jca-url').textContent;
+  navigator.clipboard.writeText(url).then(()=>{
     const b=document.querySelectorAll('.sbtn')[0];
     b.textContent='✅ Copied!';
     setTimeout(()=>b.textContent='📋 Copy JCA link',2000);
-  }).catch(()=>fallbackCopy(generatedLink));
+  }).catch(()=>{ const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta); });
 }
-function openJCALink(){ window.open(generatedLink,'_blank'); }
-function fallbackCopy(t){const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);}
 
-/* ── HELPERS ── */
-function showErr(id,msg){const el=document.getElementById(id);el.innerHTML='⚠ '+msg;el.style.display='block';}
-function show(id){document.getElementById(id).style.display='block';}
-function active(id){document.getElementById(id).classList.add('active');}
-function done(cid,nid){
-  const c=document.getElementById(cid);
-  c.classList.remove('active','warn');c.classList.add('done');
-  document.getElementById(nid).textContent='✓';
-}
+// ── HELPERS ──
+function showErr(id, msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+function hideErr(id){ document.getElementById(id).style.display='none'; }
+function setDone(cid,nid){ const c=document.getElementById(cid); c.classList.remove('active','warn'); c.classList.add('done'); document.getElementById(nid).textContent='✓'; }
+function setActive(id){ document.getElementById(id).classList.add('active'); }
 </script>
 </body>
 </html>
